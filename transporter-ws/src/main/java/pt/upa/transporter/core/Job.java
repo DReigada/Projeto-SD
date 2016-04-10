@@ -1,5 +1,6 @@
 package pt.upa.transporter.core;
 
+import pt.upa.transporter.ws.JobStateView;
 import pt.upa.transporter.ws.JobView;
 
 /**
@@ -106,11 +107,19 @@ public class Job {
 	}
 	
 	/**
-	 * TODO implement this
+	 * Returns a JobView defined in the WSDL
+	 * TODO - review where to put this method
 	 * @return
 	 */
 	public JobView getView(){
-		return null;
+		JobView view = new JobView();
+		view.setCompanyName(_transporterName);
+		view.setJobDestination(_destination);
+		view.setJobIdentifier(_identifier);
+		view.setJobOrigin(_origin);
+		view.setJobPrice(_price);
+		view.setJobState(JobStateView.valueOf(_state.name()));
+		return view;
 	}
 
 
