@@ -1,28 +1,40 @@
 package pt.upa.transporter;
 
-import java.util.List;
-
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.upa.transporter.core.Transporter;
 import pt.upa.transporter.ws.TransporterPort;
 
-
+/**
+ * This class implements an easy way of starting and binding a transporter's endpoint
+ *
+ */
 public class TransporterEndpoint{
-	private Transporter _transporter;
+	
+	// The transporter
+	private Transporter _transporter; 
+	// The endpoint URL
 	private String _endpointURL;	
+	// The UDDI URL
+	private String _uddiURL;
 	
 	private TransporterPort _port;
 	private Endpoint _endpoint;
 	private UDDINaming _uddiNaming;
-	private String _uddiURL;
-	
+
+	// states of the endpoint
 	private boolean _isRunning; 
 	private boolean _isPublished;
 	
 
-	
+	/**
+	 * Creates an Endpoint for the given transporter
+	 * @param transporter the transporter to create the endpoint
+	 * @param endpointURL the endpoint URL
+	 * @param uddiURL the UDDI URL
+	 */
 	public TransporterEndpoint(Transporter transporter, String endpointURL, String uddiURL){
 		_transporter = transporter;
 		_endpointURL = endpointURL;
@@ -31,18 +43,27 @@ public class TransporterEndpoint{
 		_isPublished = false;
 	}
 	
+	/**
+	 * Starts the Endpoint
+	 */
 	public void startEndpoint(){
-		_port = new TransporterPort();
+		_port = new TransporterPort(_transporter);
 		_endpoint = Endpoint.publish(_endpointURL, _port);
 		_isPublished = true;
 
 	}
 	
+	/**
+	 * Stops the Endpoint
+	 */
 	public void stopEndpoint(){
 		if(!_isPublished) return;
 		_endpoint.stop();
 	}
 	
+	/**
+	 * Binds the endpoint to the UDDI
+	 */
 	public void bind(){
 		if(_isRunning || !_isPublished) return;
 		try{
@@ -55,6 +76,9 @@ public class TransporterEndpoint{
 		}
 	}
 	
+	/**
+	 * Unbinds the endpoint from the UDDI
+	 */
 	public void unbind(){
 		if (!_isRunning) return;
 		try{
