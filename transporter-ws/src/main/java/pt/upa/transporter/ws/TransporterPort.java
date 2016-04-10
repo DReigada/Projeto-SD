@@ -4,10 +4,19 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import pt.upa.transporter.core.Transporter;
+
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType"
 	)
 public class TransporterPort implements TransporterPortType{
+	
+	Transporter _transporter;
+	
+	public TransporterPort(Transporter transporter) {
+		_transporter = transporter;
+	}
+	
 	/**
 	 * @param name 
 	 * @return a diagnosis message
