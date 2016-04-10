@@ -2,6 +2,9 @@ package pt.upa.transporter.core;
 
 import java.util.Hashtable;
 
+import pt.upa.transporter.core.Exceptions.BadPriceException;
+import pt.upa.transporter.core.Exceptions.InvalidCityException;
+
 public class Transporter {
 	private String _name;
 	private int _ID;
@@ -28,9 +31,10 @@ public class Transporter {
 	 */
 	public Job requestJob(String origin, String destination, int value) throws BadPriceException, InvalidCityException{
 		// case the reference value is not valid
-		if(value <= 0) throw new BadPriceException();
+		if(value <= 0) throw new BadPriceException("The reference price is invalid");
 		// case the given cities are not valid
-		if(!(Regions.validateCity(origin) && Regions.validateCity(destination))) throw new InvalidCityException();
+		if(!Regions.validateCity(origin)) throw new InvalidCityException("The origin city is invalid");
+		if(!Regions.validateCity(destination)) throw new InvalidCityException("The destination city is invalid");
 		
 		// case this transporter does not operate in the given cities
 		if(!(_operatingRegions.hasCity(origin) && _operatingRegions.hasCity(destination))) return null;
