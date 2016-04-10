@@ -1,5 +1,7 @@
 package pt.upa.transporter.core;
 
+import pt.upa.transporter.ws.JobView;
+
 /**
  * This class implements a Job from a {@link Transporter}
  *
@@ -93,6 +95,22 @@ public class Job {
 	 */
 	public State getState() {
 		return _state;
+	}
+	
+	/**
+	 * Changes the state of this job
+	 * @param state the new state
+	 */
+	public void setState(State state){
+		_state = state;
+	}
+	
+	/**
+	 * TODO implement this
+	 * @return
+	 */
+	public JobView getView(){
+		return null;
 	}
 
 
