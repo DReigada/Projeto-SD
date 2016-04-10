@@ -20,6 +20,7 @@
 
         <wsdl.directory>src/main/resources</wsdl.directory>
         <wsdl.filename>broker.1_0.wsdl</wsdl.filename>
+        <wsdl.filename2>transporter.1_0.wsdl</wsdl.filename2>
 
         <mainclass>pt.upa.broker.BrokerApplication</mainclass>
 
@@ -88,6 +89,7 @@
                     <wsdlDirectory>${wsdl.directory}</wsdlDirectory>
                     <wsdlFiles>
                         <wsdlFile>${wsdl.filename}</wsdlFile>
+                        <wsdlFile>${wsdl.filename2}</wsdlFile>
                     </wsdlFiles>
                 </configuration>
                 <dependencies>
