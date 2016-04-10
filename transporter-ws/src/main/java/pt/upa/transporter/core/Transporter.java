@@ -1,5 +1,6 @@
 package pt.upa.transporter.core;
 
+import java.util.Collection;
 import java.util.Hashtable;
 
 import pt.upa.transporter.core.Exceptions.BadPriceException;
@@ -58,6 +59,21 @@ public class Transporter {
 	 */
 	public Job getJobById(String id){
 		return _jobsList.get(id);
+	}
+	
+	/**
+	 * @return all the Jobs from this Transporter
+	 */
+	public Collection<Job> getAllJobs(){
+		return _jobsList.values();
+	}
+	
+	/**
+	 * Removes all Jobs from this transporter and resets the jobs ID
+	 */
+	public void deleteAllJobs(){
+		_jobsList = new Hashtable<String, Job>();
+		_jobCounter = 0;
 	}
 	
 	/**
