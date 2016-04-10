@@ -124,7 +124,7 @@
                     <mainClass>${mainclass}</mainClass>
                     <arguments>
                         <argument>${uddi.url}</argument>
-                        <argument>${ws.name}</argument>
+                        <argument>${ws.i}</argument>
                         <argument>${ws.url}</argument>
                     </arguments>
                 </configuration>
