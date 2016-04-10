@@ -1,5 +1,9 @@
 package pt.upa.transporter.core;
 
+/**
+ * This class implements a Job from a {@link Transporter}
+ *
+ */
 public class Job {
     protected String _transporterName;
     protected String _identifier;
@@ -8,7 +12,9 @@ public class Job {
     protected int _price;
     protected State _state;
     
-    
+    /**
+     * The states of a job
+     */
     public enum State{
         PROPOSED,
         REJECTED,
@@ -18,19 +24,27 @@ public class Job {
         COMPLETED;
     }
 
-
+    /**
+     * The default constructor
+     * @param transporterName  
+     * @param identifier
+     * @param origin
+     * @param destination
+     * @param price
+     * @param state
+     */
     public Job(String transporterName,
 	    		String identifier,
 	    		String origin,
 	    		String destination, 
 	    		int price,
 	    		State state) {
-		this._transporterName = transporterName;
-		this._identifier = identifier;
-		this._origin = origin;
-		this._destination = destination;
-		this._price = price;
-		this._state = state;
+		_transporterName = transporterName;
+		_identifier = identifier;
+		_origin = origin;
+		_destination = destination;
+		_price = price;
+		_state = state;
 	}
 
 
