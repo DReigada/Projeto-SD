@@ -34,6 +34,7 @@ public class TransporterPort implements TransporterPortType{
 			throws BadLocationFault_Exception, BadPriceFault_Exception {
 		try{
 			Job newJob = _transporter.requestJob(origin, destination, price);
+			if(newJob == null) return null;
 			return newJob.getView();
 		}
 		catch(BadPriceException e){
