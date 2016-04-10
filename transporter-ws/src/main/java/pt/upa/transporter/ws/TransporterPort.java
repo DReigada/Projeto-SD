@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import pt.upa.transporter.core.Job;
 import pt.upa.transporter.core.Transporter;
 
 @WebService(
@@ -32,17 +33,28 @@ public class TransporterPort implements TransporterPortType{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
+	/**
+	 * Changes the state of the job based if it was accepted or not 
+	 * @param id the id of the job
+	 * @param accept true if the job was accepeted
+	 * @return the job that was changed (null if no job was found it the given ID)
+	 */
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Job job = _transporter.getJobById(id);
+		job.setState(accept ? Job.State.ACCEPTED : Job.State.REJECTED);
+		return job.getView();
 	}
-
+	
+	/**
+	 * Gets the job based with the given ID 
+	 * @param id the id of the job
+	 * @return the job (null if no job was found it the given ID)
+	 */
 	@Override
 	public JobView jobStatus(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return _transporter.getJobById(id).getView();
 	}
 
 	@Override
