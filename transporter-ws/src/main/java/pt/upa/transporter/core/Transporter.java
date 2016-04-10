@@ -3,8 +3,8 @@ package pt.upa.transporter.core;
 import java.util.Collection;
 import java.util.Hashtable;
 
+import pt.upa.transporter.core.Exceptions.BadLocationException;
 import pt.upa.transporter.core.Exceptions.BadPriceException;
-import pt.upa.transporter.core.Exceptions.InvalidCityException;
 
 public class Transporter {
 	private String _name;
@@ -28,14 +28,14 @@ public class Transporter {
 	 * @param value the reference value
 	 * @return the created job or null if the job was not accepted
 	 * @throws BadPriceException if value is lesser or equal to 0
-	 * @throws InvalidCityException if origin or destination are not valid cities 
+	 * @throws BadLocationException if origin or destination are not valid cities 
 	 */
-	public Job requestJob(String origin, String destination, int value) throws BadPriceException, InvalidCityException{
+	public Job requestJob(String origin, String destination, int value) throws BadPriceException, BadLocationException{
 		// case the reference value is not valid
 		if(value <= 0) throw new BadPriceException("The reference price is invalid");
 		// case the given cities are not valid
-		if(!Regions.validateCity(origin)) throw new InvalidCityException("The origin city is invalid");
-		if(!Regions.validateCity(destination)) throw new InvalidCityException("The destination city is invalid");
+		if(!Regions.validateCity(origin)) throw new BadLocationException("The origin city is invalid", origin);
+		if(!Regions.validateCity(destination)) throw new BadLocationException("The destination city is invalid", destination);
 		
 		// case this transporter does not operate in the given cities
 		if(!(_operatingRegions.hasCity(origin) && _operatingRegions.hasCity(destination))) return null;
