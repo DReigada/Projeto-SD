@@ -23,14 +23,14 @@ public class Regions {
 	public static Boolean validateCity(String city){
 		for (Enum<NorthRegion> c : NorthRegion.values()) if(city.equals(c.name())) return true;
 		for (Enum<CentreRegion> c : CentreRegion.values()) if(city.equals(c.name())) return true;
-		for (Enum<CentreRegion> c : CentreRegion.values()) if(city.equals(c.name())) return true;
+		for (Enum<SouthRegion> c : SouthRegion.values()) if(city.equals(c.name())) return true;
 		return false;
 	}
 	
 	public Boolean hasCity(String city){
 		if(_north) for (Enum<NorthRegion> c : NorthRegion.values()) if(city.equals(c.name())) return true;
 		if(_centre) for (Enum<CentreRegion> c : CentreRegion.values()) if(city.equals(c.name())) return true;
-		if(_south) for (Enum<CentreRegion> c : CentreRegion.values()) if(city.equals(c.name())) return true;
+		if(_south) for (Enum<SouthRegion> c : SouthRegion.values()) if(city.equals(c.name())) return true;
 		return false;
 	}
 }
