@@ -1,6 +1,7 @@
 package pt.upa.transporter;
 
 import pt.upa.transporter.core.Transporter;
+import pt.upa.transporter.ws.TransporterEndpoint;
 
 public class TransporterApplication {
 

@@ -1,11 +1,10 @@
-package pt.upa.transporter;
+package pt.upa.transporter.ws;
 
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.transporter.core.Transporter;
-import pt.upa.transporter.ws.TransporterPort;
 
 /**
  * This class implements an easy way of starting and binding a transporter's endpoint
