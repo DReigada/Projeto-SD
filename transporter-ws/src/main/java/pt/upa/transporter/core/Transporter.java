@@ -93,8 +93,7 @@ public class Transporter {
 	private int generatePrice(int value) {
 		if (value > 100) return -1;
 		if (value <= 10) return --value;
-		if (value % 2  != 0) return (_ID % 2  != 0) ? --value : ++value;
-		return (_ID % 2  == 0) ? --value : ++value;
+		return (value % 2  == _ID % 2) ? --value : ++value;
 	}
 
 }
