@@ -73,14 +73,13 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public List<JobView> listJobs() {
-		// TODO Auto-generated method stub
+		_transporter.getAllJobs();
 		return null;
 	}
 
 	@Override
 	public void clearJobs() {
-		// TODO Auto-generated method stub
-		
+		_transporter.deleteAllJobs();
 	}
 	
 
