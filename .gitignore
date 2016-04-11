@@ -77,3 +77,6 @@ local.properties
 
 # Code Recommenders
 .recommenders/
+
+# MAC OSX
+.DS_Sore
