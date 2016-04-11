@@ -1,6 +1,8 @@
 package pt.upa.transporter.ws;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.jws.WebService;
 
@@ -78,8 +80,10 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public List<JobView> listJobs() {
-		_transporter.getAllJobs();
-		return null;
+	  Collection<Job> jobs = _transporter.getAllJobs();
+	  List<JobView> views = jobs.stream().map(Job -> Job.getView()).collect(Collectors.toList());
+
+	  return views;
 	}
 
 	@Override
