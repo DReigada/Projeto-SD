@@ -58,6 +58,7 @@ public class TransporterEndpoint{
 	public void stopEndpoint(){
 		if(!_isPublished) return;
 		_endpoint.stop();
+		_port.stopSimulator();
 	}
 	
 	/**

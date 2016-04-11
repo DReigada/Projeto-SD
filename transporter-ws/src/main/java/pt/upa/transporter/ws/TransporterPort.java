@@ -8,6 +8,7 @@ import pt.upa.transporter.core.Job;
 import pt.upa.transporter.core.Transporter;
 import pt.upa.transporter.core.Exceptions.BadLocationException;
 import pt.upa.transporter.core.Exceptions.BadPriceException;
+import pt.upa.transporter.simulator.JobStateSimulator;
 
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType"
@@ -15,9 +16,11 @@ import pt.upa.transporter.core.Exceptions.BadPriceException;
 public class TransporterPort implements TransporterPortType{
 	
 	Transporter _transporter;
+	public JobStateSimulator _jobSimulator;
 	
 	public TransporterPort(Transporter transporter) {
 		_transporter = transporter;
+		_jobSimulator = new JobStateSimulator();
 	}
 	
 	/**
@@ -59,6 +62,7 @@ public class TransporterPort implements TransporterPortType{
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
 		Job job = _transporter.getJobById(id);
 		job.setState(accept ? Job.State.ACCEPTED : Job.State.REJECTED);
+		if(accept) _jobSimulator.addJob(job);
 		return job.getView();
 	}
 	
@@ -83,5 +87,10 @@ public class TransporterPort implements TransporterPortType{
 		_transporter.deleteAllJobs();
 	}
 	
-
+	/**
+	 * Stops the job simulator
+	 */
+	void stopSimulator(){
+		_jobSimulator.stop();
+	}
 }
