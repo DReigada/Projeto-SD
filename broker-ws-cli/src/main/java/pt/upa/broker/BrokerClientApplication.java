@@ -21,7 +21,7 @@ public class BrokerClientApplication {
 			System.out.println("Connect to booking system? (y/n)");
 			String option = input.next();
 			switch (option) {
-			case "s":
+			case "y":
 				System.out.println("connecting...");
 				client.start(args);
 				int i = menu(client);
