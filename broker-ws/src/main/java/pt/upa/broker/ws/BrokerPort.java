@@ -51,7 +51,9 @@ public class BrokerPort implements BrokerPortType {
     public void setTransportCompany(String company) { _transportView.setTransporterCompany(company); }
     public void setTransportPrice(int price) { _transportView.setPrice(price); }
     public void setTransporterId(String id) { _transporterId = id; }
-    
+
+    public String getTransporterId() { return _transporterId; }
+    public TransportView getTransportView() { return _transportView; }
   }
 
   TransporterCompaniesManager _transportersManager;
