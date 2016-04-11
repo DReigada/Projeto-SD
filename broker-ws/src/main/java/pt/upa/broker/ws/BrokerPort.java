@@ -47,13 +47,19 @@ public class BrokerPort implements BrokerPortType {
       _transportView = t;
     }
 
-    public void setTransportState(TransportStateView state) { _transportView.setState(state); }
-    public void setTransportCompany(String company) { _transportView.setTransporterCompany(company); }
+    // Transport view attribute setters
     public void setTransportPrice(int price) { _transportView.setPrice(price); }
-    public void setTransporterId(String id) { _transporterId = id; }
+    public void setTransportCompany(String company) { _transportView.setTransporterCompany(company); }
+    public void setTransportState(TransportStateView state) { _transportView.setState(state); }    
 
-    public String getTransporterId() { return _transporterId; }
+    // Transport view attribute getters
+    public String getTransportCompany() { return _transportView.getTransporterCompany(); }
+    public TransportStateView getTransportState() { _transportView.getState(); }
     public TransportView getTransportView() { return _transportView; }
+
+    // Id given by transporter company setter and getter
+    public void setTransporterId(String id) { _transporterId = id; }
+    public String getTransporterId() { return _transporterId; }
   }
 
   TransporterCompaniesManager _transportersManager;
@@ -84,8 +90,6 @@ public class BrokerPort implements BrokerPortType {
       throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
     }
 
-    int previousNumberTransports = _transports.size();
-
     Collection<TransporterPortType> temp;
     try {
       temp = _transportersManager.getAllTransporterPorts();
@@ -110,11 +114,12 @@ public class BrokerPort implements BrokerPortType {
 
     int bestPrice = Integer.MAX_VALUE, bestJobIndex = 0;
 
+    int previousNumberTransports = _transports.size();
     JobView[] proposedJobs = new JobView[transporters.size()];
 
     for (int i=0; i<transporters.size(); ++i){
       int thisIndex = previousNumberTransports+i;
-      BrokerTransportView t = new BrokerTransportView(_transports.size()+"", origin, destination);
+      BrokerTransportView t = new BrokerTransportView(thisIndex+"", origin, destination);
       _transports.add(t);
 
       TransporterPortType port = transporters.get(i);
@@ -144,7 +149,6 @@ public class BrokerPort implements BrokerPortType {
       _transports.get(thisIndex).setTransportState(TransportStateView.BUDGETED);
       _transports.get(thisIndex).setTransportCompany(job.getCompanyName());
       _transports.get(thisIndex).setTransportPrice(job.getJobPrice());
-      _transports.get(thisIndex).setTransporterId(job.getJobIdentifier());
 
       int proposedPrice = job.getJobPrice();
 
@@ -156,7 +160,7 @@ public class BrokerPort implements BrokerPortType {
         
       if (proposedPrice < bestPrice) {
         bestPrice = proposedPrice;
-        bestJobIndex = i;
+        bestJobIndex = thisIndex;
       }
     }
 
@@ -176,7 +180,7 @@ public class BrokerPort implements BrokerPortType {
       if (proposedJobs[i] == null) continue;
 
       TransporterPortType port = transporters.get(i);
-      boolean isAccepted = i == bestJobIndex;
+      boolean isAccepted = thisIndex == bestJobIndex;
 
       TransportStateView state 
           = (isAccepted ? TransportStateView.BOOKED : TransportStateView.FAILED);
@@ -192,28 +196,38 @@ public class BrokerPort implements BrokerPortType {
         }
       }
     }
-
-    return previousNumberTransports + bestJobIndex + "";
+    return bestJobIndex + "";
   }
 
   @Override
   public TransportView viewTransport(String id) throws 
       UnknownTransportFault_Exception {
 
-    int index = String.parseInt(id);
-
-    if (index >= _transports.size()) {
+    int index;
+    try {
+      index = Integer.parseInt(id);
+    } catch (NumberFormatException e) {
       UnknownTransportFault faultInfo = new UnknownTransportFault();
       faultInfo.setId(id);
       throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
     }
 
-    // get BrokerTransportView object that matches the given id
-    BrokerTransportView transport = _transports.get(index);
+    // test for invalid id
+    if (index >= _transports.size() || index < 0) {
+      UnknownTransportFault faultInfo = new UnknownTransportFault();
+      faultInfo.setId(id);
+      throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
+    }
 
-    // if its a null object throw UnknownTransportFault
+    // get transport that matches the given id
+    BrokerTransportView transport = _transports.get(index);
+    if (transport == null) {
+      UnknownTransportFault faultInfo = new UnknownTransportFault();
+      faultInfo.setId(id);
+      throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
+    }
     
-    // if state is not FINISHED or FAILED
+    // update state if transport is not COMPLETED or FAILED
       // gets the port handle for the company doing the transport from the transporters manager object
       // if its null do something
       // asks the company (jobStatus method) for the jobView 
