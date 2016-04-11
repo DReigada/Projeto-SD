@@ -38,7 +38,13 @@
         <uddi.url>http://localhost:9090</uddi.url>
     </properties>
 
-    <dependencies>
+	<dependencies>
+		<!-- UDDI-naming -->
+		<dependency>
+			<groupId>pt.ulisboa.tecnico.sdis</groupId>
+			<artifactId>uddi-naming</artifactId>
+			<version>1.0</version>
+		</dependency>
         <!-- JAX-WS -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
@@ -118,7 +124,7 @@
                     <mainClass>${mainclass}</mainClass>
                     <arguments>
                         <argument>${uddi.url}</argument>
-                        <argument>${ws.name}</argument>
+                        <argument>${ws.i}</argument>
                         <argument>${ws.url}</argument>
                     </arguments>
                 </configuration>

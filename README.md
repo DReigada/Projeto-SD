@@ -71,15 +71,15 @@ mvn clean install
 [1] Construir e executar **servidor**
 
 ```
-cd ...-ws
-mvn clean install
-mvn exec:java
+cd transporter-ws
+mvn clean compile
+mvn exec:java [-Dws.i=tranporterID]
 ```
 
 [2] Construir **cliente** e executar testes
 
 ```
-cd ...-ws-cli
+cd transporter-ws-cli
 mvn clean install
 ```
 
