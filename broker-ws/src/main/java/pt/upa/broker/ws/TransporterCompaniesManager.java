@@ -34,13 +34,13 @@ public class TransporterCompaniesManager {
     _transporterCompaniesPorts = new HashMap<String, TransporterPortType>();
   }
 
-  public TransporterPortType getTransporterPort(String name){
+  public TransporterPortType getTransporterPort(String name) throws JAXRException {
     try {
       String _endpointAddress = _uddiNaming.lookup(name);
     
     } catch (JAXRException e){
       reconnectUDDI();
-      return null;
+      throw new JAXRException("Error connecting to juddi server.", e);
     }
     return _transporterCompaniesPorts.get(_endpointAddress);
   }
