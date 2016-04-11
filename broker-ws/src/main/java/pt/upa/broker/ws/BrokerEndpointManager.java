@@ -1,6 +1,4 @@
-package pt.upa.broker;
-
-import pt.upa.broker.ws.BrokerPort;
+package pt.upa.broker.ws;
 
 import javax.xml.ws.Endpoint;
 
@@ -30,15 +28,15 @@ public class BrokerEndpointManager {
     _endpoint = Endpoint.create(port);
 
     // publish endpoint
-    System.out.printf("Starting %s%n", _url);
     _endpoint.publish(_url);
   }
 
   public void awaitConnections(String name) throws 
      JAXRException {
+    _name = name;
     // publish to UDDI
     _uddiNaming = new UDDINaming(_uddiURL);
-    _uddiNaming.rebind(name, _url);
+    _uddiNaming.rebind(_name, _url);
   }
 
   public void stop() {

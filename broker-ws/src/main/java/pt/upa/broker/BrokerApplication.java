@@ -1,6 +1,7 @@
 package pt.upa.broker;
 
 import java.util.Scanner;
+import pt.upa.broker.ws.BrokerEndpointManager;
 
 public class BrokerApplication {
 
