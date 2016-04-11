@@ -31,7 +31,6 @@ public class TransporterCompaniesManager {
   }
 
   public TransporterPortType getTransporterPort(String name) throws JAXRException {
-    // TODO
     try {
       String endpointAddress = _uddiNaming.lookup(name);
     

@@ -15,6 +15,7 @@ import pt.upa.broker.ws.TransportView;
 
 import pt.upa.transporter.ws.TransporterPortType;
 import pt.upa.transporter.ws.JobView;
+import pt.upa.transporter.ws.JobStateView;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
@@ -115,11 +116,10 @@ public class BrokerPort implements BrokerPortType {
     int bestPrice = Integer.MAX_VALUE, bestJobIndex = 0;
 
     int previousNumberTransports = _transports.size();
-    JobView[] proposedJobs = new JobView[transporters.size()];
 
     for (int i=0; i<transporters.size(); ++i){
       int thisIndex = previousNumberTransports+i;
-      BrokerTransportView t = new BrokerTransportView(thisIndex+"", origin, destination);
+      BrokerTransportView transport = new BrokerTransportView(thisIndex+"", origin, destination);
       _transports.add(t);
 
       TransporterPortType port = transporters.get(i);
@@ -138,7 +138,6 @@ public class BrokerPort implements BrokerPortType {
         faultInfo.setPrice(price);
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
       }
-      proposedJobs[i] = job;
 
       if (job == null){
         _transports.set(thisIndex, null); 
@@ -146,14 +145,15 @@ public class BrokerPort implements BrokerPortType {
         continue;
       }
       
-      _transports.get(thisIndex).setTransportState(TransportStateView.BUDGETED);
-      _transports.get(thisIndex).setTransportCompany(job.getCompanyName());
-      _transports.get(thisIndex).setTransportPrice(job.getJobPrice());
+      transport.setTransportState(TransportStateView.BUDGETED);
+      transport.setTransportCompany(job.getCompanyName());
+      transport.setTransportPrice(job.getJobPrice());
+      transport.setTransporterId(job.getJobIdentifier());
 
       int proposedPrice = job.getJobPrice();
 
       if (proposedPrice > price){ 
-        _transports.get(thisIndex).setTransportState(TransportStateView.FAILED);
+        transport.setTransportState(TransportStateView.FAILED);
         if (reason != -1) reason = 1; 
       }
       else reason = -1;
@@ -177,17 +177,18 @@ public class BrokerPort implements BrokerPortType {
 
     for (int i=0; i<transporters.size(); ++i){
       int thisIndex = previousNumberTransports+i;
-      if (proposedJobs[i] == null) continue;
+      BrokerTransportView transport = _transports.get(thisIndex);
+      if (transport == null) continue;
 
       TransporterPortType port = transporters.get(i);
       boolean isAccepted = thisIndex == bestJobIndex;
 
       TransportStateView state 
           = (isAccepted ? TransportStateView.BOOKED : TransportStateView.FAILED);
-      _transports.get(thisIndex).setTransportState(state);
+      transport.setTransportState(state);
       
       try {
-        port.decideJob(proposedJobs[i].getJobIdentifier(), isAccepted);
+        port.decideJob(transport.getTransporterId(), isAccepted);
       } catch(BadJobFault_Exception e) {
         if (isAccepted) {
           UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
@@ -227,11 +228,12 @@ public class BrokerPort implements BrokerPortType {
       throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
     }
     
-    // update state if transport is not COMPLETED or FAILED
-      // gets the port handle for the company doing the transport from the transporters manager object
-      // if its null do something
-      // asks the company (jobStatus method) for the jobView 
+    // update state of transport if transport is not COMPLETED or FAILED
+
       // updates the transportView of the BrokerTransportView with the returned jobState
+    }
+      // gets the port handle for the company doing the transport from the transporters manager object
+      
 
     // returns the TransportView attribute of the brokerTransportView object
   }
