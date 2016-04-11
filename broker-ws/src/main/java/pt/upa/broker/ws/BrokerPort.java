@@ -142,14 +142,11 @@ public class BrokerPort implements BrokerPortType {
 
       int proposedPrice = job.getJobPrice();
 
-      if (proposedPrice > price){  
-        if (reason != -1) reason = 1; 
-        continue;
-      }
-
-      if (price < bestPrice){ 
-        reason = -1;
-        bestPrice = price;
+      if (proposedPrice > price && reason != -1) reason = 1; 
+      else reason = -1;
+        
+      if (proposedPrice < bestPrice) {
+        bestPrice = proposedPrice;
         bestJobIndex = i;
       }
     }
