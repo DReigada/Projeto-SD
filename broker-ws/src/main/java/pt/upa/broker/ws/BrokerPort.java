@@ -77,6 +77,7 @@ public class BrokerPort implements BrokerPortType {
 
     if (price < 0){ 
       InvalidPriceFault faultInfo = new InvalidPriceFault();
+      faultInfo.setPrice(price);
       throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
     }
 
@@ -88,11 +89,13 @@ public class BrokerPort implements BrokerPortType {
 
     } catch (JAXRException e) {
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
+      faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("Error connecting to transporters. PLease try again.", faultInfo);
     }
     List<TransporterPortType> transporters = new ArrayList<TransporterPortType>(temp);
     if (transporters == null){ 
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
+      faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("No transporter companies available.", faultInfo);
     }
 
@@ -121,6 +124,7 @@ public class BrokerPort implements BrokerPortType {
 
       } catch (BadPriceFault_Exception e) {
         InvalidPriceFault faultInfo = new InvalidPriceFault();
+        faultInfo.setPrice(price);
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
       }
       proposedJobs[i] = job;
@@ -152,10 +156,12 @@ public class BrokerPort implements BrokerPortType {
 
     if (reason == 0) {
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
+      faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("No transport available for the requested route.", faultInfo);
     }
     if (reason == 1) {
       UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
+      faultInfo.setBestPriceFound(bestPrice);
       throw new UnavailableTransportPriceFault_Exception("No transport available for the requested price.", faultInfo); 
     }
 
