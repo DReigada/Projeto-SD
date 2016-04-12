@@ -282,6 +282,24 @@ public class BrokerPort implements BrokerPortType {
 
   @Override
   public void clearTransports() {
+    List<TransporterPortType> companies;
+    // get all the transporter companies
+    try {
+      Collection<TransporterPortType> temp = _transportersManager.getAllTransporterPorts();
+      companies = new ArrayList<TransporterPortType>(temp);
+    } catch (JAXRException e) {
+      System.out.println("Error occurred connecting to juddi. Unable to clear " +
+        "the transports. Please try again.");
+      return;
+    } 
+    // for each company tell it to clear its jobs
+    for (TransporterPortType port : companies) port.clearJobs();
+
+    /* reset the Broker */
+    // reset the Manager
+    _transportersManager = new TransporterCompaniesManager();
+    // clear the transports list
+    _transports = new ArrayList<BrokerTransportView>();
 
   }
 
