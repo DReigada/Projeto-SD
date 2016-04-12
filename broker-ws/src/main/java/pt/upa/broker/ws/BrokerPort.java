@@ -213,7 +213,7 @@ public class BrokerPort implements BrokerPortType {
       throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
     }
 
-    // test for invalid id
+    // check if id is invalid
     if (index >= _transports.size() || index < 0) {
       UnknownTransportFault faultInfo = new UnknownTransportFault();
       faultInfo.setId(id);
@@ -246,6 +246,7 @@ public class BrokerPort implements BrokerPortType {
 
       // gets the updated state of the transport from the company
       JobView job = company.jobStatus(transport.getTransporterId());
+      
       TransportStateView state;
       try {
         state = convertToTransportStateView(job.getJobState());
@@ -255,10 +256,9 @@ public class BrokerPort implements BrokerPortType {
         throw new UnknownTransportFault_Exception("Invalid state" +
         " returned by the transporter company. Please try again.", faultInfo);
       }
-
       // finally updates the transport state in the broker
       transport.setTransportState(state);
-    }
+    } 
 
     // returns the transport view to the client
     return transport.getTransportView();    
@@ -266,7 +266,17 @@ public class BrokerPort implements BrokerPortType {
 
   @Override
   public List<TransportView> listTransports() {
-    return new ArrayList<TransportView>();
+    List<TransportView> allTransports = new ArrayList<TransportView>();
+
+    for (int i=0; i<_transports.size(); ++i) {
+      try {
+        TransportView transport = viewTransport(i+"");
+        allTransports.add(transport);
+
+      } catch (UnknownTransportFault_Exception e) {/* nothing */}
+    }
+
+    return allTransports;
   }
 
   @Override
