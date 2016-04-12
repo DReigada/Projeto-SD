@@ -55,7 +55,7 @@ public class BrokerPort implements BrokerPortType {
 
     // Transport view attribute getters
     public String getTransportCompany() { return _transportView.getTransporterCompany(); }
-    public TransportStateView getTransportState() { _transportView.getState(); }
+    public TransportStateView getTransportState() { return _transportView.getState(); }
     public TransportView getTransportView() { return _transportView; }
 
     // Id given by transporter company setter and getter
@@ -120,7 +120,7 @@ public class BrokerPort implements BrokerPortType {
     for (int i=0; i<transporters.size(); ++i){
       int thisIndex = previousNumberTransports+i;
       BrokerTransportView transport = new BrokerTransportView(thisIndex+"", origin, destination);
-      _transports.add(t);
+      _transports.add(transport);
 
       TransporterPortType port = transporters.get(i);
 
@@ -233,8 +233,9 @@ public class BrokerPort implements BrokerPortType {
           || transport.getTransportState() == TransportStateView.HEADING) {
 
       // gets the transporter company doing the transport
+      TransporterPortType company;
       try {
-        TransporterPortType company = _transportersManager.getTransporterPort(transport.getTransportCompany());
+        company = _transportersManager.getTransporterPort(transport.getTransportCompany());
       } catch (JAXRException e) {
         UnknownTransportFault faultInfo = new UnknownTransportFault();
         faultInfo.setId(id);
@@ -284,17 +285,20 @@ public class BrokerPort implements BrokerPortType {
 
   }
 
-  private TransportStateView convertToTransportStateView(JobStateView state) {
+  private TransportStateView convertToTransportStateView(JobStateView state) throws 
+      UnknownTransportFault_Exception {
+    TransportStateView validState;
     switch (state) {
-            case JobStateView.HEADING:    TransportStateView.HEADING;
-                                          break;
-            case JobStateView.ONGOING:    TransportStateView.ONGOING;
-                                          break;
-            case JobStateView.COMPLETED:  TransportStateView.COMPLETED;
-                                          break;
+            case HEADING:   validState = TransportStateView.HEADING;
+                            break;
+            case ONGOING:   validState = TransportStateView.ONGOING;
+                            break;
+            case COMPLETED: validState = TransportStateView.COMPLETED;
+                            break;
             default:  UnknownTransportFault faultInfo = new UnknownTransportFault();
                       throw new UnknownTransportFault_Exception("Invalid state" +
                         " returned by the transporter company.", faultInfo);
         }
+    return validState;
   }
 }

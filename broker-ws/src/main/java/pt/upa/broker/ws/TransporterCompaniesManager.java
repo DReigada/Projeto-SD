@@ -31,8 +31,9 @@ public class TransporterCompaniesManager {
   }
 
   public TransporterPortType getTransporterPort(String name) throws JAXRException {
+    String endpointAddress;
     try {
-      String endpointAddress = _uddiNaming.lookup(name);
+      endpointAddress = _uddiNaming.lookup(name);
     
     } catch (JAXRException e){
       reconnectUDDI();
