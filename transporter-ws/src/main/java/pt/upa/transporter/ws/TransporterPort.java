@@ -59,10 +59,16 @@ public class TransporterPort implements TransporterPortType{
 	 * @param id the id of the job
 	 * @param accept true if the job was accepeted
 	 * @return the job that was changed (null if no job was found it the given ID)
+	 * @throws BadJobFault_Exception in case the ID is invalid
 	 */
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
 		Job job = _transporter.getJobById(id);
+		if (job == null){
+			BadJobFault fault = new BadJobFault();
+			fault.setId(id);
+			throw new BadJobFault_Exception("Invalid Job ID", fault);
+		}
 		job.setState(accept ? Job.State.ACCEPTED : Job.State.REJECTED);
 		if(accept) _jobSimulator.addJob(job);
 		return job.getView();
