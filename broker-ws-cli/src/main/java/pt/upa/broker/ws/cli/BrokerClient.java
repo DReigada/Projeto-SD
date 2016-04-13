@@ -89,16 +89,12 @@ public class BrokerClient {
 			reply = port.requestTransport(origin, destination, price);
 		} catch (InvalidPriceFault_Exception e) {
 			reply = "Booking failed: Invalid defined maximum price";
-			e.printStackTrace();
 		} catch (UnavailableTransportFault_Exception e) {
 			reply = "Booking failed: No transporter is available";
-			e.printStackTrace();
 		} catch (UnavailableTransportPriceFault_Exception e) {
 			reply = "Booking failed: No transporter is available within price range";
-			e.printStackTrace();
 		} catch (UnknownLocationFault_Exception e) {
 			reply = "Booking failed: Location is invalid";
-			e.printStackTrace();
 		}
 		return reply;
 	}
