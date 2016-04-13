@@ -117,7 +117,6 @@ public class BrokerClientApplication {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please insert the id of the transport service in question:");
 		String id = input.next();
-
 		//method call. it may fail if the transport id requested does not exist
 		try {
 			//calls printTransportInfo method that organises and prints the requested info
