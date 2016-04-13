@@ -39,6 +39,28 @@ public abstract class RequestJobTest {
     	_port = null;
     }
 
+    // Test the returned JobView
+    @Test
+    public void testReturnedJobView() throws Exception{
+    	String 	city1 = "Lisboa",
+    			city2 = "Coimbra";
+    	
+    	JobView job = _port.requestJob(city1, city2, 50);
+    	assertEquals(city1, job.getJobOrigin());
+    	assertEquals(city2, job.getJobDestination());
+    	assertEquals("UpaTransporter" + _ID, job.getCompanyName());
+    	assertEquals("1", job.getJobIdentifier());
+    	assertTrue(job.getJobPrice() > 0);
+    	assertEquals(JobStateView.PROPOSED, job.getJobState());
+    	
+    	job = _port.requestJob(city2, city1, 10);
+    	assertEquals(city2, job.getJobOrigin());
+    	assertEquals(city1, job.getJobDestination());
+    	assertEquals("UpaTransporter" + _ID, job.getCompanyName());
+    	assertEquals("2", job.getJobIdentifier());
+    	assertTrue(job.getJobPrice() > 0);
+    	assertEquals(JobStateView.PROPOSED, job.getJobState());
+    }
 
     // Location related tests
 	
