@@ -21,11 +21,7 @@ public class TransporterCompaniesManager {
 
   private final static String UDDI_URL = "http://localhost:9090";
   private UDDINaming _uddiNaming; 
-
   private final static String TRANSPORTERS_NAME_REGEX = "UpaTransporter%";
-
-  private String _endpointAddress;
-
   private Map<String, TransporterPortType> _transporterCompaniesPorts;
   
 
@@ -34,15 +30,16 @@ public class TransporterCompaniesManager {
     _transporterCompaniesPorts = new HashMap<String, TransporterPortType>();
   }
 
-  public TransporterPortType getTransporterPort(String name){
+  public TransporterPortType getTransporterPort(String name) throws JAXRException {
+    String endpointAddress;
     try {
-      String _endpointAddress = _uddiNaming.lookup(name);
+      endpointAddress = _uddiNaming.lookup(name);
     
     } catch (JAXRException e){
       reconnectUDDI();
-      return null;
+      throw new JAXRException("Error connecting to juddi server.", e);
     }
-    return _transporterCompaniesPorts.get(_endpointAddress);
+    return _transporterCompaniesPorts.get(endpointAddress);
   }
 
   /***
@@ -81,7 +78,7 @@ public class TransporterCompaniesManager {
 
         BindingProvider bindingProvider = (BindingProvider) port;
         Map<String, Object> requestContext = bindingProvider.getRequestContext();
-        requestContext.put(ENDPOINT_ADDRESS_PROPERTY, _endpointAddress);
+        requestContext.put(ENDPOINT_ADDRESS_PROPERTY, transporterEndpoint);
       }
 
       // add port to known registered transporters

@@ -15,6 +15,7 @@ import pt.upa.broker.ws.TransportView;
 
 import pt.upa.transporter.ws.TransporterPortType;
 import pt.upa.transporter.ws.JobView;
+import pt.upa.transporter.ws.JobStateView;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
@@ -47,10 +48,19 @@ public class BrokerPort implements BrokerPortType {
       _transportView = t;
     }
 
-    public void setTransportState(TransportStateView state) { _transportView.setState(state); }
-    public void setTransportCompany(String company) { _transportView.setTransporterCompany(company); }
+    // Transport view attribute setters
     public void setTransportPrice(int price) { _transportView.setPrice(price); }
+    public void setTransportCompany(String company) { _transportView.setTransporterCompany(company); }
+    public void setTransportState(TransportStateView state) { _transportView.setState(state); }    
+
+    // Transport view attribute getters
+    public String getTransportCompany() { return _transportView.getTransporterCompany(); }
+    public TransportStateView getTransportState() { return _transportView.getState(); }
+    public TransportView getTransportView() { return _transportView; }
+
+    // Id given by transporter company setter and getter
     public void setTransporterId(String id) { _transporterId = id; }
+    public String getTransporterId() { return _transporterId; }
   }
 
   TransporterCompaniesManager _transportersManager;
@@ -81,8 +91,6 @@ public class BrokerPort implements BrokerPortType {
       throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
     }
 
-    int nextId = _transports.size();
-
     Collection<TransporterPortType> temp;
     try {
       temp = _transportersManager.getAllTransporterPorts();
@@ -107,11 +115,12 @@ public class BrokerPort implements BrokerPortType {
 
     int bestPrice = Integer.MAX_VALUE, bestJobIndex = 0;
 
-    JobView[] proposedJobs = new JobView[transporters.size()];
+    int previousNumberTransports = _transports.size();
 
     for (int i=0; i<transporters.size(); ++i){
-      BrokerTransportView t = new BrokerTransportView(_transports.size()+"", origin, destination);
-      _transports.add(t);
+      int thisIndex = previousNumberTransports+i;
+      BrokerTransportView transport = new BrokerTransportView(thisIndex+"", origin, destination);
+      _transports.add(transport);
 
       TransporterPortType port = transporters.get(i);
 
@@ -119,35 +128,39 @@ public class BrokerPort implements BrokerPortType {
       try {
         job = port.requestJob(origin, destination, price);
       } catch (BadLocationFault_Exception e) {
+        _transports.set(thisIndex, null); 
         UnknownLocationFault faultInfo = new UnknownLocationFault();
         throw new UnknownLocationFault_Exception("Unknown origin or destination.", faultInfo);
 
       } catch (BadPriceFault_Exception e) {
+        _transports.set(thisIndex, null); 
         InvalidPriceFault faultInfo = new InvalidPriceFault();
         faultInfo.setPrice(price);
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
       }
-      proposedJobs[i] = job;
 
       if (job == null){
-        _transports.set(_transports.size()-1, null); 
+        _transports.set(thisIndex, null); 
         if (reason != -1) reason = 0; 
         continue;
       }
-      int index = nextId+i;
-      _transports.get(index).setTransportState(TransportStateView.BUDGETED);
-      _transports.get(index).setTransportCompany(job.getCompanyName());
-      _transports.get(index).setTransportPrice(job.getJobPrice());
-      _transports.get(index).setTransporterId(job.getJobIdentifier());
+      
+      transport.setTransportState(TransportStateView.BUDGETED);
+      transport.setTransportCompany(job.getCompanyName());
+      transport.setTransportPrice(job.getJobPrice());
+      transport.setTransporterId(job.getJobIdentifier());
 
       int proposedPrice = job.getJobPrice();
 
-      if (proposedPrice > price && reason != -1) reason = 1; 
+      if (proposedPrice > price){ 
+        transport.setTransportState(TransportStateView.FAILED);
+        if (reason != -1) reason = 1; 
+      }
       else reason = -1;
         
       if (proposedPrice < bestPrice) {
         bestPrice = proposedPrice;
-        bestJobIndex = i;
+        bestJobIndex = thisIndex;
       }
     }
 
@@ -163,17 +176,19 @@ public class BrokerPort implements BrokerPortType {
     }
 
     for (int i=0; i<transporters.size(); ++i){
-      if (proposedJobs[i] == null) continue;
+      int thisIndex = previousNumberTransports+i;
+      BrokerTransportView transport = _transports.get(thisIndex);
+      if (transport == null) continue;
 
       TransporterPortType port = transporters.get(i);
-      boolean isAccepted = i == bestJobIndex;
+      boolean isAccepted = thisIndex == bestJobIndex;
 
       TransportStateView state 
           = (isAccepted ? TransportStateView.BOOKED : TransportStateView.FAILED);
-      _transports.get(nextId+i).setTransportState(state);
+      transport.setTransportState(state);
       
       try {
-        port.decideJob(proposedJobs[i].getJobIdentifier(), isAccepted);
+        port.decideJob(transport.getTransporterId(), isAccepted);
       } catch(BadJobFault_Exception e) {
         if (isAccepted) {
           UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
@@ -182,23 +197,126 @@ public class BrokerPort implements BrokerPortType {
         }
       }
     }
-
-    return nextId + bestJobIndex + "";
+    return bestJobIndex + "";
   }
 
   @Override
   public TransportView viewTransport(String id) throws 
       UnknownTransportFault_Exception {
-        return new TransportView();
+
+    int index;
+    try {
+      index = Integer.parseInt(id);
+    } catch (NumberFormatException e) {
+      UnknownTransportFault faultInfo = new UnknownTransportFault();
+      faultInfo.setId(id);
+      throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
+    }
+
+    // check if id is invalid
+    if (index >= _transports.size() || index < 0) {
+      UnknownTransportFault faultInfo = new UnknownTransportFault();
+      faultInfo.setId(id);
+      throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
+    }
+
+    // get transport that matches the given id
+    BrokerTransportView transport = _transports.get(index);
+    if (transport == null) {
+      UnknownTransportFault faultInfo = new UnknownTransportFault();
+      faultInfo.setId(id);
+      throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
+    }
+    
+    // update state of transport in broker if transport is not COMPLETED or FAILED
+    if ( transport.getTransportState() == TransportStateView.ONGOING 
+          || transport.getTransportState() == TransportStateView.HEADING) {
+
+      // gets the transporter company doing the transport
+      TransporterPortType company;
+      try {
+        company = _transportersManager.getTransporterPort(transport.getTransportCompany());
+      } catch (JAXRException e) {
+        UnknownTransportFault faultInfo = new UnknownTransportFault();
+        faultInfo.setId(id);
+        throw new UnknownTransportFault_Exception("Failed to connect to the server. Please try again.", faultInfo);
+      }
+
+      // set transport to completed if company that made the transport is no longer in business
+      if (company == null) transport.setTransportState(TransportStateView.COMPLETED);
+
+      // gets the updated state of the transport from the company
+      JobView job = company.jobStatus(transport.getTransporterId());
+      
+      TransportStateView state;
+      try {
+        state = convertToTransportStateView(job.getJobState());
+      } catch (UnknownTransportFault_Exception e) {
+        UnknownTransportFault faultInfo = new UnknownTransportFault();
+        faultInfo.setId(id);
+        throw new UnknownTransportFault_Exception("Invalid state" +
+        " returned by the transporter company. Please try again.", faultInfo);
+      }
+      // finally updates the transport state in the broker
+      transport.setTransportState(state);
+    } 
+
+    // returns the transport view to the client
+    return transport.getTransportView();    
   }
 
   @Override
   public List<TransportView> listTransports() {
-    return new ArrayList<TransportView>();
+    List<TransportView> allTransports = new ArrayList<TransportView>();
+
+    for (int i=0; i<_transports.size(); ++i) {
+      try {
+        TransportView transport = viewTransport(i+"");
+        allTransports.add(transport);
+
+      } catch (UnknownTransportFault_Exception e) {/* nothing */}
+    }
+
+    return allTransports;
   }
 
   @Override
   public void clearTransports() {
+    List<TransporterPortType> companies;
+    // get all the transporter companies
+    try {
+      Collection<TransporterPortType> temp = _transportersManager.getAllTransporterPorts();
+      companies = new ArrayList<TransporterPortType>(temp);
+    } catch (JAXRException e) {
+      System.out.println("Error occurred connecting to juddi. Unable to clear " +
+        "the transports. Please try again.");
+      return;
+    } 
+    // for each company tell it to clear its jobs
+    for (TransporterPortType port : companies) port.clearJobs();
 
+    /* reset the Broker */
+    // reset the Manager
+    _transportersManager = new TransporterCompaniesManager();
+    // clear the transports list
+    _transports = new ArrayList<BrokerTransportView>();
+
+  }
+
+  private TransportStateView convertToTransportStateView(JobStateView state) throws 
+      UnknownTransportFault_Exception {
+    TransportStateView validState;
+    switch (state) {
+            case HEADING:   validState = TransportStateView.HEADING;
+                            break;
+            case ONGOING:   validState = TransportStateView.ONGOING;
+                            break;
+            case COMPLETED: validState = TransportStateView.COMPLETED;
+                            break;
+            default:  UnknownTransportFault faultInfo = new UnknownTransportFault();
+                      throw new UnknownTransportFault_Exception("Invalid state" +
+                        " returned by the transporter company.", faultInfo);
+        }
+    return validState;
   }
 }
