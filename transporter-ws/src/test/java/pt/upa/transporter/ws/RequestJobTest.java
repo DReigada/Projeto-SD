@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pt.upa.transporter.core.Transporter;
@@ -17,35 +15,26 @@ import pt.upa.transporter.core.Transporter;
  *  Invoked by Maven in the "test" life-cycle phase
  *  If necessary, should invoke "mock" remote servers 
  */
-public class RequestJobTest {
-
-    // static members
-	private static TransporterPort _port= null;
-
-    // one-time initialization and clean-up
-
-    @BeforeClass
-    public static void oneTimeSetUp() {
-    	_port = new TransporterPort(new Transporter(1));
-    }
-
-    @AfterClass
-    public static void oneTimeTearDown() {
-    	_port = null;
-    }
-
-
-    // members
+public abstract class RequestJobTest {
+	
+	private int _ID;
+	
+	protected RequestJobTest(int transporterID) {
+		_ID = transporterID;
+	}
     
+	private TransporterPort _port= null;
 
     // initialization and clean-up for each test
 
     @Before
     public void setUp() {
+    	_port = new TransporterPort(new Transporter(_ID));
     }
 
     @After
     public void tearDown() {
+    	_port = null;
     }
 
 
@@ -74,6 +63,4 @@ public class RequestJobTest {
 			assertEquals(badCityName, e.getFaultInfo().getLocation());
 		}
     }
-    
-
 }
