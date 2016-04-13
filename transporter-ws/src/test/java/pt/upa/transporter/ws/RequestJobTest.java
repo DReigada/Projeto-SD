@@ -1,6 +1,7 @@
 package pt.upa.transporter.ws;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
@@ -63,4 +64,55 @@ public abstract class RequestJobTest {
 			assertEquals(badCityName, e.getFaultInfo().getLocation());
 		}
     }
+    
+    @Test
+    public void testPriceLessOrEqualZero() throws Exception{
+    	int badPrice = -10;
+    	try {
+			_port.requestJob("Lisboa", "Lisboa", badPrice);
+			fail();
+		} catch (BadPriceFault_Exception e) {
+			assertEquals("The reference price is invalid", e.getMessage());
+			assertEquals(badPrice, (int) e.getFaultInfo().getPrice());
+		}
+    }
+    
+    @Test
+    public void testPriceGreaterThanOneHundred() throws Exception{
+    		JobView job = _port.requestJob("Lisboa", "Lisboa", 101);
+    		assertEquals(null, job);
+    }
+    
+    @Test
+    public void testPriceLessOrEqualTen() throws Exception{
+		JobView job = _port.requestJob("Lisboa", "Lisboa", 9);
+		assertTrue(job.getJobPrice() < 9);
+    }
+    
+    @Test
+    public void testOddPriceBetweenTenAndHundred() throws Exception{
+    	int price = 15;
+    	JobView job = _port.requestJob("Lisboa", "Lisboa", price);
+    	assertTrue((_ID % 2 == 0) ? job.getJobPrice() > price : job.getJobPrice() < price);
+    }
+    
+    @Test
+    public void testEvenPriceBetweenTenAndHundred() throws Exception{
+    	int price = 16;
+    	JobView job = _port.requestJob("Lisboa", "Lisboa", price);
+    	assertTrue((_ID % 2 == 0) ? job.getJobPrice() < price : job.getJobPrice() > price);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
