@@ -30,7 +30,7 @@ public class JobStatusTest {
     	_job2 = null;
     }
     
-    // Test if the return jobView matched the ones return by requestJob
+    // Test if the returned jobView match the ones return by requestJob
     @Test
     public void testWithExintingID(){
     	JobView job1 = _port.jobStatus("1");
@@ -51,7 +51,7 @@ public class JobStatusTest {
     	assertEquals(_job2.getJobState(), job2.getJobState());
     }
     
-    // test if the return value is null if the ID is invalid
+    // Test if the return value is null when the ID is invalid
     @Test
     public void testWithInvalidID(){
     	assertNull(_port.jobStatus("not valid ID"));
