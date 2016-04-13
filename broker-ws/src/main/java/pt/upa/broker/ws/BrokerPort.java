@@ -230,7 +230,8 @@ public class BrokerPort implements BrokerPortType {
     
     // update state of transport in broker if transport is not COMPLETED or FAILED
     if ( transport.getTransportState() == TransportStateView.ONGOING 
-          || transport.getTransportState() == TransportStateView.HEADING) {
+          || transport.getTransportState() == TransportStateView.HEADING
+          || transport.getTransportState() == TransportStateView.BOOKED) {
 
       // gets the transporter company doing the transport
       TransporterPortType company;
