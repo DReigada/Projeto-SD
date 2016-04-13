@@ -81,7 +81,9 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	@Override
 	public JobView jobStatus(String id) {
-		return _transporter.getJobById(id).getView();
+		Job job = _transporter.getJobById(id);
+		if(job == null) return null;
+		return job.getView();
 	}
 
 	@Override
