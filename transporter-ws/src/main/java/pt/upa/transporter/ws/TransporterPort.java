@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.jws.WebService;
 
 import pt.upa.transporter.core.Job;
+import pt.upa.transporter.core.Job.State;
 import pt.upa.transporter.core.Transporter;
 import pt.upa.transporter.core.Exceptions.BadLocationException;
 import pt.upa.transporter.core.Exceptions.BadPriceException;
@@ -69,8 +70,10 @@ public class TransporterPort implements TransporterPortType{
 			fault.setId(id);
 			throw new BadJobFault_Exception("Invalid Job ID", fault);
 		}
-		job.setState(accept ? Job.State.ACCEPTED : Job.State.REJECTED);
-		if(accept) _jobSimulator.addJob(job);
+		if (!(job.getState() == State.ACCEPTED || job.getState() == State.REJECTED)){
+			job.setState(accept ? Job.State.ACCEPTED : Job.State.REJECTED);
+			if(accept) _jobSimulator.addJob(job);
+		}
 		return job.getView();
 	}
 	
