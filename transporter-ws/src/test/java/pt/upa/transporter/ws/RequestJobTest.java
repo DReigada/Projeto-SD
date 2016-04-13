@@ -53,13 +53,27 @@ public class RequestJobTest {
 
     @Test
     public void testUnknownOrigin() throws Exception {
+    	String badCityName = "not a city";
     	try {
-			_port.requestJob("not a city", "Lisboa", 10);
+			_port.requestJob(badCityName, "Lisboa", 10);
 			fail();
 		} catch (BadLocationFault_Exception e) {
 			assertEquals("The origin city is invalid", e.getMessage());
-			assertEquals("not a city", e.getFaultInfo().location);
+			assertEquals(badCityName, e.getFaultInfo().getLocation());
 		}
     }
+    
+    @Test
+    public void testUnknownDestination() throws Exception {
+    	String badCityName = "not a city";
+    	try {
+			_port.requestJob("Lisboa", badCityName, 10);
+			fail();
+		} catch (BadLocationFault_Exception e) {
+			assertEquals("The destination city is invalid", e.getMessage());
+			assertEquals(badCityName, e.getFaultInfo().getLocation());
+		}
+    }
+    
 
 }
