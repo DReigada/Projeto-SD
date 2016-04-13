@@ -1,6 +1,7 @@
 package pt.upa.transporter.ws;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -24,7 +25,7 @@ public abstract class RequestJobTest {
 		_ID = transporterID;
 	}
     
-	private TransporterPort _port= null;
+	protected TransporterPort _port = null;
 
     // initialization and clean-up for each test
 
@@ -39,8 +40,46 @@ public abstract class RequestJobTest {
     }
 
 
-    // tests
-
+    // Location related tests
+	
+    /**
+     * The following tests test if the transporter returns null if the 
+     * origin/destination given is outside their operation region
+     */
+	@Test
+	public void testOriginInNorthRegion() throws Exception {
+		assertEquals(_ID % 2 != 0, _port.requestJob("Porto", "Lisboa", 10) == null);
+	}
+	
+	@Test
+    public void testOriginInCentreRegion() throws Exception {
+		assertNotNull(_port.requestJob("Lisboa", "Lisboa", 10));
+    }
+	
+	@Test
+    public void testOriginInSouthRegion() throws Exception {
+		assertEquals(_ID % 2 == 0, _port.requestJob("Faro", "Lisboa", 10) == null);
+    }
+	
+	@Test
+	public void testDestinationInNorthRegion() throws Exception {
+		assertEquals(_ID % 2 != 0, _port.requestJob("Porto", "Lisboa", 10) == null);
+	}
+	
+	@Test
+    public void testDestinationInCentreRegion() throws Exception {
+		assertNotNull(_port.requestJob("Lisboa", "Lisboa", 10));
+    }
+	
+	@Test
+    public void testDestinationInSouthRegion() throws Exception {
+		assertEquals(_ID % 2 == 0, _port.requestJob("Faro", "Lisboa", 10) == null);
+    }
+	
+    /**
+     * The following tests test if the transporter throws 
+     * BadLocationFault_Exception if the origin/destination is not valid
+     */
     @Test
     public void testUnknownOrigin() throws Exception {
     	String badCityName = "not a city";
@@ -64,6 +103,9 @@ public abstract class RequestJobTest {
 			assertEquals(badCityName, e.getFaultInfo().getLocation());
 		}
     }
+    
+    
+    // Price Related Tests
     
     @Test
     public void testPriceLessOrEqualZero() throws Exception{
