@@ -1,7 +1,7 @@
 package pt.upa.transporter.core;
 
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import pt.upa.transporter.core.Exceptions.BadLocationException;
 import pt.upa.transporter.core.Exceptions.BadPriceException;
@@ -9,14 +9,14 @@ import pt.upa.transporter.core.Exceptions.BadPriceException;
 public class Transporter {
 	private String _name;
 	private int _ID;
-	private Hashtable<String, Job> _jobsList;
+	private HashMap<String, Job> _jobsList;
 	private int _jobCounter;
 	private Regions _operatingRegions;
 	
 	public Transporter(int ID) {
 		_ID = ID;
 		_name = "UpaTransporter" + ID;
-		_jobsList = new Hashtable<String, Job>();
+		_jobsList = new HashMap<String, Job>();
 		_jobCounter = 0;
 		_operatingRegions = new Regions(ID%2==0, true, ID%2!=0);
 	}
@@ -72,7 +72,7 @@ public class Transporter {
 	 * Removes all Jobs from this transporter and resets the jobs ID
 	 */
 	public void deleteAllJobs(){
-		_jobsList = new Hashtable<String, Job>();
+		_jobsList.clear();
 		_jobCounter = 0;
 	}
 	
