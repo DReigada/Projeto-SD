@@ -50,6 +50,7 @@ public class AuxMethodsTest {
 		}
     }
     
+    @Test
     public void testClearJobs() throws Exception{
     	_port.requestJob("Lisboa", "Faro", 50);
     	_port.requestJob("Coimbra", "Faro", 50);
@@ -60,6 +61,7 @@ public class AuxMethodsTest {
     	assertTrue(_port.listJobs().isEmpty());
     }
     
+    @Test
     public void testPingReturn(){
     	String ping = "Ping";
     	assertEquals("Received message: " + ping ,_port.ping(ping));
