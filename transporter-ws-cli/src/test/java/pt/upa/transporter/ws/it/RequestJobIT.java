@@ -1,8 +1,6 @@
 package pt.upa.transporter.ws.it;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -26,6 +24,8 @@ public class RequestJobIT extends BaseIT{
     	assertEquals("1", job.getJobIdentifier());
     	assertTrue(job.getJobPrice() > 0);
     	assertEquals(JobStateView.PROPOSED, job.getJobState());
+    	
+    	assertNull(transporter1.requestJob(city1, city2, 500));
     	
     	job = transporter2.requestJob(city2, city1, 10);
     	assertEquals(city2, job.getJobOrigin());
@@ -64,7 +64,6 @@ public class RequestJobIT extends BaseIT{
 		}
     }
     
-    // < 0
     @Test
     public void testPriceEqualZero() throws Exception{
     	int badPrice = 0;
