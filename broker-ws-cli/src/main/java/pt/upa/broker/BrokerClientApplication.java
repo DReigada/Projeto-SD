@@ -1,5 +1,6 @@
 package pt.upa.broker;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import pt.upa.broker.ws.TransportView;
@@ -94,14 +95,21 @@ public class BrokerClientApplication {
 		System.out.println("Destination: ");
 		String destination = input.next();
 		System.out.println("Maximum price:");
-		int price = input.nextInt();
-		
+		int price = 0;
+		while (true) {
+			try {
+				price = input.nextInt();
+				break;
+			}
+			catch (InputMismatchException e) {
+				System.out.println("Insert a valid price (integer): ");
+			}
+		}
 		//method call
 		String reply = client.requestTransport(origin, destination, price);
 		//response from broker
 		System.out.println(reply);
 	}
-	
 
 	private static void view() {
 		//id input from user
@@ -109,14 +117,12 @@ public class BrokerClientApplication {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please insert the id of the transport service in question:");
 		String id = input.next();
-
 		//method call. it may fail if the transport id requested does not exist
 		try {
 			//calls printTransportInfo method that organises and prints the requested info
 			printTransportInfo(client.viewTransport(id));
 		} catch (UnknownTransportFault_Exception e) {
 			System.out.println("Unknown transport id");
-			e.printStackTrace();
 		}
 	}
 	
