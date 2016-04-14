@@ -56,8 +56,6 @@ public class RequestTransportIT extends BaseBrokerIT{
 		
     }
     
-    //TODO: test when the best price is greater than the reference price
-    
     // First id of valid price must be 1
     @Test
     public void testReturnedTransportId() throws Exception{
