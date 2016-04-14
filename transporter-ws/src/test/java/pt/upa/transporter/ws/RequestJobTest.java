@@ -128,9 +128,23 @@ public abstract class RequestJobTest {
     
     
     // Price Related Tests
-    
+
+    // < 0
     @Test
-    public void testPriceLessOrEqualZero() throws Exception{
+    public void testPriceEqualZero() throws Exception{
+    	int badPrice = 0;
+    	try {
+			_port.requestJob("Lisboa", "Lisboa", badPrice);
+			fail();
+		} catch (BadPriceFault_Exception e) {
+			assertEquals("The reference price is invalid", e.getMessage());
+			assertEquals(badPrice, (int) e.getFaultInfo().getPrice());
+		}
+    }
+    
+    // = 0
+    @Test
+    public void testPriceLesserThanZero() throws Exception{
     	int badPrice = -10;
     	try {
 			_port.requestJob("Lisboa", "Lisboa", badPrice);
@@ -141,42 +155,48 @@ public abstract class RequestJobTest {
 		}
     }
     
+    // < 10
     @Test
-    public void testPriceGreaterThanOneHundred() throws Exception{
-    		JobView job = _port.requestJob("Lisboa", "Lisboa", 101);
-    		assertEquals(null, job);
-    }
-    
-    @Test
-    public void testPriceLessOrEqualTen() throws Exception{
+    public void testPriceLesserThanTen() throws Exception{
 		JobView job = _port.requestJob("Lisboa", "Lisboa", 9);
 		assertTrue(job.getJobPrice() < 9);
     }
     
+    // = 10
+    @Test
+    public void testPriceEqualsTen() throws Exception{
+		JobView job = _port.requestJob("Lisboa", "Lisboa", 10);
+		assertTrue(job.getJobPrice() < 10);
+    }
+    
+    // Odd (> 10 && < 100)
     @Test
     public void testOddPriceBetweenTenAndHundred() throws Exception{
     	int price = 15;
     	JobView job = _port.requestJob("Lisboa", "Lisboa", price);
     	assertTrue((_ID % 2 == 0) ? job.getJobPrice() > price : job.getJobPrice() < price);
     }
-    
+
+    // Even (> 10 && < 100)   
     @Test
     public void testEvenPriceBetweenTenAndHundred() throws Exception{
     	int price = 16;
     	JobView job = _port.requestJob("Lisboa", "Lisboa", price);
     	assertTrue((_ID % 2 == 0) ? job.getJobPrice() < price : job.getJobPrice() > price);
     }
+    
+    // > 100
+    @Test
+    public void testPriceEqualsOneHundred() throws Exception{
+    	int price = 100;
+    	JobView job = _port.requestJob("Lisboa", "Lisboa", price);
+    	assertTrue((_ID % 2 == 0) ? job.getJobPrice() < price : job.getJobPrice() > price);
+    }
+    
+    // > 100
+    @Test
+    public void testPriceGreaterThanOneHundred() throws Exception{
+    		JobView job = _port.requestJob("Lisboa", "Lisboa", 101);
+    		assertEquals(null, job);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
