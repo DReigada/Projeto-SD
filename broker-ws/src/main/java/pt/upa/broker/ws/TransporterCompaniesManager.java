@@ -1,36 +1,28 @@
 package pt.upa.broker.ws;
 
-import javax.xml.ws.BindingProvider;
-import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
-
-import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
-
 import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.registry.JAXRException;
 
-// wsimport generated classes
-import pt.upa.transporter.ws.TransporterService;
-import pt.upa.transporter.ws.TransporterPortType;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.upa.transporter.ws.cli.TransporterClient;
 
 public class TransporterCompaniesManager {
 
   private final static String UDDI_URL = "http://localhost:9090";
   private UDDINaming _uddiNaming; 
   private final static String TRANSPORTERS_NAME_REGEX = "UpaTransporter%";
-  private Map<String, TransporterPortType> _transporterCompaniesPorts;
+  private Map<String, TransporterClient> _transporterCompaniesPorts;
   
 
   public TransporterCompaniesManager() {
     reconnectUDDI();
-    _transporterCompaniesPorts = new HashMap<String, TransporterPortType>();
+    _transporterCompaniesPorts = new HashMap<String, TransporterClient>();
   }
 
-  public TransporterPortType getTransporterPort(String name) throws JAXRException {
+  public TransporterClient getTransporterPort(String name) throws JAXRException {
     String endpointAddress;
     try {
       endpointAddress = _uddiNaming.lookup(name);
@@ -45,7 +37,7 @@ public class TransporterCompaniesManager {
   /***
    * Returns null if empty or if there was an error connect
    */
-  public Collection<TransporterPortType> getAllTransporterPorts() throws JAXRException {
+  public Collection<TransporterClient> getAllTransporterPorts() throws JAXRException {
     // get all transporter companies registered
     Collection<String> availableTransportersEndpoints = null;
     try {
@@ -59,30 +51,24 @@ public class TransporterCompaniesManager {
     if (availableTransportersEndpoints.isEmpty()) return null;
 
     // creates the return array of available services
-    Map<String, TransporterPortType> newTransporterCompaniesPorts = 
-        new HashMap<String, TransporterPortType>();
+    Map<String, TransporterClient> newTransporterCompaniesPorts = 
+        new HashMap<String, TransporterClient>();
 
-    TransporterPortType port;
+    TransporterClient transporter;
 
     // add service port from every available transporter service to the known services 
     for (String transporterEndpoint : availableTransportersEndpoints){
 
       // if port was already known simply add it to the knew known
       if (_transporterCompaniesPorts.containsKey(transporterEndpoint)) {
-        port = _transporterCompaniesPorts.get(transporterEndpoint);
+        transporter = _transporterCompaniesPorts.get(transporterEndpoint);
 
       } else {
-        // get new port
-        TransporterService service = new TransporterService();
-        port = service.getTransporterPort();
-
-        BindingProvider bindingProvider = (BindingProvider) port;
-        Map<String, Object> requestContext = bindingProvider.getRequestContext();
-        requestContext.put(ENDPOINT_ADDRESS_PROPERTY, transporterEndpoint);
+    	  transporter = new TransporterClient(transporterEndpoint);
       }
 
       // add port to known registered transporters
-      newTransporterCompaniesPorts.put(transporterEndpoint, port);
+      newTransporterCompaniesPorts.put(transporterEndpoint, transporter);
     }
 
     // swap the knew known transporter services with the previous

@@ -1,24 +1,18 @@
 package pt.upa.broker.ws;
 
-import javax.jws.WebService;
-
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collection;
+import java.util.List;
 
+import javax.jws.WebService;
 import javax.xml.registry.JAXRException;
 
-import pt.upa.broker.ws.TransportStateView;
-import pt.upa.broker.ws.TransportView;
-
-import pt.upa.transporter.ws.TransporterPortType;
-import pt.upa.transporter.ws.JobView;
-import pt.upa.transporter.ws.JobStateView;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
+import pt.upa.transporter.ws.JobStateView;
+import pt.upa.transporter.ws.JobView;
+import pt.upa.transporter.ws.cli.TransporterClient;
 
 
 @WebService(
@@ -91,7 +85,7 @@ public class BrokerPort implements BrokerPortType {
       throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
     }
 
-    Collection<TransporterPortType> temp;
+    Collection<TransporterClient> temp;
     try {
       temp = _transportersManager.getAllTransporterPorts();
 
@@ -100,7 +94,7 @@ public class BrokerPort implements BrokerPortType {
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("Error connecting to transporters. PLease try again.", faultInfo);
     }
-    List<TransporterPortType> transporters = new ArrayList<TransporterPortType>(temp);
+    List<TransporterClient> transporters = new ArrayList<TransporterClient>(temp);
     if (transporters == null){ 
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
@@ -122,7 +116,7 @@ public class BrokerPort implements BrokerPortType {
       BrokerTransportView transport = new BrokerTransportView(thisIndex+"", origin, destination);
       _transports.add(transport);
 
-      TransporterPortType port = transporters.get(i);
+      TransporterClient port = transporters.get(i);
 
       JobView job;
       try {
@@ -180,7 +174,7 @@ public class BrokerPort implements BrokerPortType {
       BrokerTransportView transport = _transports.get(thisIndex);
       if (transport == null) continue;
 
-      TransporterPortType port = transporters.get(i);
+      TransporterClient port = transporters.get(i);
       boolean isAccepted = thisIndex == bestJobIndex;
 
       TransportStateView state 
@@ -234,7 +228,7 @@ public class BrokerPort implements BrokerPortType {
           || transport.getTransportState() == TransportStateView.BOOKED) {
 
       // gets the transporter company doing the transport
-      TransporterPortType company;
+      TransporterClient company;
       try {
         company = _transportersManager.getTransporterPort(transport.getTransportCompany());
       } catch (JAXRException e) {
@@ -283,18 +277,18 @@ public class BrokerPort implements BrokerPortType {
 
   @Override
   public void clearTransports() {
-    List<TransporterPortType> companies;
+    List<TransporterClient> companies;
     // get all the transporter companies
     try {
-      Collection<TransporterPortType> temp = _transportersManager.getAllTransporterPorts();
-      companies = new ArrayList<TransporterPortType>(temp);
+      Collection<TransporterClient> temp = _transportersManager.getAllTransporterPorts();
+      companies = new ArrayList<TransporterClient>(temp);
     } catch (JAXRException e) {
       System.out.println("Error occurred connecting to juddi. Unable to clear " +
         "the transports. Please try again.");
       return;
     } 
     // for each company tell it to clear its jobs
-    for (TransporterPortType port : companies) port.clearJobs();
+    for (TransporterClient port : companies) port.clearJobs();
 
     /* reset the Broker */
     // reset the Manager
