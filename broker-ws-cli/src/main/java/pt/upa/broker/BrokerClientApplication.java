@@ -106,7 +106,9 @@ public class BrokerClientApplication {
 				System.out.println("Insert a valid price (integer): ");
 			}
 
+
 		}		
+
 
 		//method call
 		String reply = client.requestTransport(origin, destination, price);
