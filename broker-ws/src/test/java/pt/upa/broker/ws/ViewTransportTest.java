@@ -1,6 +1,7 @@
 package pt.upa.broker.ws;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -127,37 +128,63 @@ public class ViewTransportTest extends BaseTest {
     	}};
     }
 	
-	/* TESTS VALID ID 
+	/* TESTS VALID ID */
 	// TEST: only one element in _transports (valid)
 	@Test
-    public void testViewTransportWithOneElement() throws Exception{
-    	UnknownTransportFault fault = new UnknownTransportFault();
-    	fault.setId(null);
+    public void testViewTransportWithOneValidElement() throws Exception{
     	
     	new Expectations(){{
     		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
-    		transporter.requestJob(anyString, anyString, PRICE_1);
+    		transporter.requestJob(anyString, anyString, anyInt);
     		result = _jobView1;
+    		manager.getTransporterPort(anyString); result = transporter;
+    		transporter.jobStatus(anyString); result = _jobView2;
+    	}};
+    	
+    	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_2);
+    	TransportView transport1 = _broker.viewTransport(ID_1);
+		
+    	assertEquals(ID_1, transport1.getId());
+		assertEquals(ORIGIN_1, transport1.getOrigin());
+		assertEquals(DESTINATION_1, transport1.getDestination());
+		assertTrue(PRICE_1 == transport1.getPrice());
+		assertEquals(COMPANY_1_NAME, transport1.getTransporterCompany());
+    	
+		
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 1;
+    		transporter.requestJob(anyString, anyString, anyInt); times = 1;
+    		manager.getTransporterPort(anyString); times = 1;
+    		transporter.jobStatus(anyString); times = 1;
+    	}};
+    }
+	// TEST: only one element in _transports (invalid)
+	@Test
+    public void testViewTransportWithOneInvalidElement() throws Exception{
+    	
+    	new Expectations(){{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		transporter.requestJob(anyString, anyString, anyInt);
+    		result = _jobView2;
     	}};
     	
     	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
-    	TransportView j = _broker.viewTransport("1");
+    	TransportView transport1 = _broker.viewTransport(ID_1);
 		
-    	assertEquals();
+    	assertEquals(ID_1, transport1.getId());
+		assertEquals(ORIGIN_1, transport1.getOrigin());
+		assertEquals(DESTINATION_1, transport1.getDestination());
+		assertTrue(null == transport1.getPrice());
+		assertEquals(null, transport1.getTransporterCompany());
+		assertEquals(TransportStateView.FAILED, transport1.getState());
     	
-    	_jobView1.setCompanyName(COMPANY_1_NAME);
-		_jobView1.setJobOrigin(ORIGIN_1);
-		_jobView1.setJobDestination(DESTINATION_1);
-		_jobView1.setJobIdentifier(ID_1);
-		_jobView1.setJobPrice(PRICE_1);
-		_jobView1.setJobState(STATE_1);
 		
     	new Verifications() {{
     		manager.getAllTransporterPorts(); times = 1;
     		transporter.requestJob(anyString, anyString, anyInt); times = 1;
     	}};
-    }*/
-	// TEST: only one element in _transports (invalid)
+    }
+	
 	// TEST: only one element in _transports (valid) with transport price = reference price
 	// TEST: two valid transports, check one of them
 	// TEST: two invalid transports, check one of them
