@@ -261,22 +261,23 @@ public class BrokerPort implements BrokerPortType {
       // set transport to completed if company that made the transport is no longer in business
       if (company == null) transport.setTransportState(TransportStateView.COMPLETED);
 
-      // gets the updated state of the transport from the company
-      JobView job = company.jobStatus(transport.getTransporterId());
-      
-      TransportStateView state;
-      try {
-        state = convertToTransportStateView(job.getJobState());
-      } catch (UnknownTransportFault_Exception e) {
-        UnknownTransportFault faultInfo = new UnknownTransportFault();
-        faultInfo.setId(id);
-        throw new UnknownTransportFault_Exception("Invalid state" +
-        " returned by the transporter company. Please try again.", faultInfo);
+      else {
+        // gets the updated state of the transport from the company
+        JobView job = company.jobStatus(transport.getTransporterId());
+        
+        TransportStateView state;
+        try {
+          state = convertToTransportStateView(job.getJobState());
+        } catch (UnknownTransportFault_Exception e) {
+          UnknownTransportFault faultInfo = new UnknownTransportFault();
+          faultInfo.setId(id);
+          throw new UnknownTransportFault_Exception("Invalid state" +
+          " returned by the transporter company. Please try again.", faultInfo);
+        }
+        // finally updates the transport state in the broker
+        transport.setTransportState(state);
       }
-      // finally updates the transport state in the broker
-      transport.setTransportState(state);
-    } 
-
+    }
     // returns the transport view to the client
     return transport.getTransportView();    
   }
