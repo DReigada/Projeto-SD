@@ -5,8 +5,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
-import javax.xml.registry.JAXRException;
-
 import org.junit.Test;
 
 import mockit.Expectations;
@@ -27,7 +25,7 @@ public class RequestTransportTest extends BaseTest{
     	}};
     	
     	String id = _broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
-    	assertEquals("0", id);
+    	assertEquals("1", id);
     	
     	new Verifications() {{
     		manager.getAllTransporterPorts(); times = 1;
@@ -46,8 +44,8 @@ public class RequestTransportTest extends BaseTest{
     	String id1 = _broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
     	String id2 = _broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
 
-    	assertEquals("0", id1);
-    	assertEquals("1", id2);
+    	assertEquals("1", id1);
+    	assertEquals("2", id2);
     	
     	new Verifications() {{
     		manager.getAllTransporterPorts(); times = 2;
@@ -170,6 +168,29 @@ public class RequestTransportTest extends BaseTest{
     	new Verifications() {{
     		manager.getAllTransporterPorts(); times = 1;
     		transporter.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); times = 0;
+    	}};
+    }
+    
+    @Test
+    public void testNoInterestedTransporter() throws Exception{
+		
+    	new Expectations() {{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		transporter.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); result = null;
+    	}};
+    	
+    	try {
+			_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
+			fail();
+		} catch (UnavailableTransportFault_Exception e) {
+			assertEquals("No transport available for the requested route.", e.getMessage());
+			assertEquals(ORIGIN_1, e.getFaultInfo().getOrigin());
+			assertEquals(DESTINATION_1, e.getFaultInfo().getDestination());
+		}
+    	
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 1;
+    		transporter.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); times = 1;
     	}};
     }
     
