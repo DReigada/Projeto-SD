@@ -58,7 +58,7 @@ public class RequestTransportTest extends BaseTest{
     	new Expectations() {{
     		manager.getAllTransporterPorts(); result = Arrays.asList(transporter, transporter2);
     		transporter.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); result = _jobView1;
-    		transporter2.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); result = _jobView2;
+    		transporter2.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); result = _jobViewTransporter2;
     	}};
     	
     	String id = _broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1); 	
