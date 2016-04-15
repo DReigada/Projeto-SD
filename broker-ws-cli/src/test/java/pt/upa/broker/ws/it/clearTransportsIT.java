@@ -9,9 +9,9 @@ public class clearTransportsIT extends BaseBrokerIT {
 	@Test
     public void testUnknownDestination() throws Exception {
     	
-    	String t1 = client.requestTransport("Lisboa", "Coimbra", 30);
-    	String t2 = client.requestTransport("Lisboa", "Leiria", 20);
-    	String t3 = client.requestTransport("Lisboa", "Aveiro", 40);
+    	client.requestTransport("Lisboa", "Coimbra", 30);
+    	client.requestTransport("Lisboa", "Leiria", 20);
+    	client.requestTransport("Lisboa", "Aveiro", 40);
 		
     	client.clearTransports();
     	
