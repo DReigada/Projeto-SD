@@ -28,6 +28,7 @@ public class BaseTest {
 	public static final String BAD_LOCATION = "not a city";
 	public static final int PRICE_1 = 5;
 	public static final int PRICE_2 = 8;
+	public static final int BAD_PRICE = -7;
 	public static final String ID_1 = "1";
 	public static final String ID_2 = "2";
 	public static final JobStateView STATE_1 = JobStateView.PROPOSED;
