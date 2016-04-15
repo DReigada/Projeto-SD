@@ -31,6 +31,9 @@ public class BaseTest {
 	public static final int BAD_PRICE = -7;
 	public static final String ID_1 = "1";
 	public static final String ID_2 = "2";
+	public static final String INVALID_ID_1 = "invalid";
+	public static final String INVALID_ID_2 = "0";
+	public static final String INVALID_ID_3 = "3";
 	public static final JobStateView STATE_1 = JobStateView.PROPOSED;
 	public static final JobStateView STATE_2 = JobStateView.PROPOSED;
 	public static final String ERROR_MESSAGE_1= "error message";
