@@ -36,7 +36,6 @@ public class BrokerPort implements BrokerPortType {
       t.setId(id);
       t.setOrigin(origin);
       t.setDestination(dest);
-      t.setTransporterCompany("");
       t.setState(TransportStateView.REQUESTED);
 
       _transportView = t;
@@ -127,8 +126,8 @@ public class BrokerPort implements BrokerPortType {
     int bestPrice = Integer.MAX_VALUE, bestJobIndex = 0;
     JobView bestJob = null;
 
-    int previousNumberTransports = _transports.size();
-    BrokerTransportView transport = new BrokerTransportView(previousNumberTransports+"", origin, destination);
+    int thisId = _transports.size() + 1;
+    BrokerTransportView transport = new BrokerTransportView(thisId+"", origin, destination);
     transport.setTransportState(TransportStateView.REQUESTED);
     _transports.add(transport);
 
@@ -168,17 +167,14 @@ public class BrokerPort implements BrokerPortType {
       }
     }
 
-    transport.setTransportState(TransportStateView.BUDGETED);
-    transport.setTransportCompany(bestJob.getCompanyName());
-    transport.setTransportPrice(bestJob.getJobPrice());
-    transport.setTransporterId(bestJob.getJobIdentifier());
-
     if (reason == 0) {
       transport.setTransportState(TransportStateView.FAILED);
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("No transport available for the requested route.", faultInfo);
     }
+
+    transport.setTransportState(TransportStateView.BUDGETED);
 
     for (int i=0; i<transporters.size(); ++i){
 
@@ -190,7 +186,7 @@ public class BrokerPort implements BrokerPortType {
       boolean isAccepted = reason == -1 && i == bestJobIndex;
       
       try {
-        port.decideJob(transport.getTransporterId(), isAccepted);
+        port.decideJob(job.getJobIdentifier(), isAccepted);
       } catch(BadJobFault_Exception e) {
         if (isAccepted) {
           UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
@@ -200,15 +196,20 @@ public class BrokerPort implements BrokerPortType {
       }
     }
 
-    if (reason == -1) transport.setTransportState(TransportStateView.BOOKED);
-    else {
+    if (reason == -1){ 
+      transport.setTransportCompany(bestJob.getCompanyName());
+      transport.setTransportPrice(bestJob.getJobPrice());
+      transport.setTransporterId(bestJob.getJobIdentifier());
+      transport.setTransportState(TransportStateView.BOOKED);
+
+    } else {
       transport.setTransportState(TransportStateView.FAILED);
       UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
       faultInfo.setBestPriceFound(bestPrice);
       throw new UnavailableTransportPriceFault_Exception("No transport available for the requested price.", faultInfo); 
     }
 
-    return previousNumberTransports + "";
+    return thisId+"";
   }
 
   @Override
@@ -223,6 +224,8 @@ public class BrokerPort implements BrokerPortType {
       faultInfo.setId(id);
       throw new UnknownTransportFault_Exception("No transports match the given transport identifier.", faultInfo);
     }
+
+    --index; //converts index to index the transports list
 
     // check if id is invalid
     if (index >= _transports.size() || index < 0) {
@@ -283,7 +286,7 @@ public class BrokerPort implements BrokerPortType {
 
     for (int i=0; i<_transports.size(); ++i) {
       try {
-        TransportView transport = viewTransport(i+"");
+        TransportView transport = viewTransport(i+1+"");
         allTransports.add(transport);
 
       } catch (UnknownTransportFault_Exception e) {/* nothing */}
