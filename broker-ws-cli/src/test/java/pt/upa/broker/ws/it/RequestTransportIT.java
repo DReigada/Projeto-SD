@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class RequestTransportIT extends BaseBrokerIT{
+public class RequestTransportIT extends BaseBrokerIT {
 	// tests
 	// assertEquals(expected, actual);
 
