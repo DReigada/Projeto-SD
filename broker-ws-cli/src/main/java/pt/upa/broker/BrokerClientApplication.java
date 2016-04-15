@@ -91,9 +91,9 @@ public class BrokerClientApplication {
 		Scanner input = new Scanner(System.in);
 		System.out.println("TRANSPORT REQUEST FORM");
 		System.out.println("Origin: ");
-		String origin = input.next();
+		String origin = input.nextLine();
 		System.out.println("Destination: ");
-		String destination = input.next();
+		String destination = input.nextLine();
 		System.out.println("Maximum price:");
 			
 		int price = 0;

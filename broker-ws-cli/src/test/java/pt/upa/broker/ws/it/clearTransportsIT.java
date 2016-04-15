@@ -7,7 +7,7 @@ import org.junit.Test;
 public class clearTransportsIT extends BaseBrokerIT {
 	
 	@Test
-    public void testUnknownDestination() throws Exception {
+    public void testClearTransports() throws Exception {
     	
     	client.requestTransport("Lisboa", "Coimbra", 30);
     	client.requestTransport("Lisboa", "Leiria", 20);
@@ -16,6 +16,19 @@ public class clearTransportsIT extends BaseBrokerIT {
     	client.clearTransports();
     	
     	assertTrue(client.listTransports().isEmpty());
+    	
 		
     }
+	
+	@Test
+    public void testClearRequestTransports() throws Exception {
+    			
+    	client.clearTransports();
+    	client.requestTransport("Lisboa", "Coimbra", 30);
+
+    	assertTrue(client.listTransports().size() == 1);
+    			
+    }
+	
+	
 }
