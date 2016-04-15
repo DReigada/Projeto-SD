@@ -99,25 +99,9 @@ public class BrokerClient {
 		return reply;
 	}
 	
-	public String[] viewTransport(String id) throws UnknownTransportFault_Exception {
+	public TransportView viewTransport(String id) throws UnknownTransportFault_Exception {
 		TransportView transportView = port.viewTransport(id);
-		//call the method to get all the info about the transport
-		//pass the array of strings to the client application, for display
-		return getTransportInfo(transportView);
-	}
-	
-	public String[] getTransportInfo(TransportView transportView){
-		String[] transport = new String[6];
-		
-		//populate an array of strings with the return values 
-		transport[0] = transportView.getId();
-		transport[1] = transportView.getOrigin();
-		transport[2] = transportView.getDestination();
-		transport[3] = transportView.getPrice().toString();
-		transport[4] = transportView.getTransporterCompany();
-		transport[5] = transportView.getState().toString();
-		
-		return transport;
+		return transportView;
 	}
 	
 	public List<TransportView> listTransports() {
