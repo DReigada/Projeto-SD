@@ -31,7 +31,7 @@ public class ViewTransportIT extends BaseBrokerIT {
 		String id = client.requestTransport("Lisboa", "Coimbra", 31);
 		TransportView transport1 = client.viewTransport(id);
 		
-		String id2 = client.requestTransport("Viseu", "Guarda", 8);
+		String id2 = client.requestTransport("Viseu", "Guarda", 32);
 		TransportView transport2 = client.viewTransport(id2);
 		
 		client.requestTransport("Porto", "Faro", 1);
@@ -48,7 +48,7 @@ public class ViewTransportIT extends BaseBrokerIT {
 		assertEquals("Viseu", transport2.getOrigin());
 		assertEquals("Guarda", transport2.getDestination());
 		assertTrue(transport2.getPrice() > 0);
-		assertEquals("UpaTransporter1", transport2.getTransporterCompany());
+		assertEquals("UpaTransporter2", transport2.getTransporterCompany());
 		assertTrue(transport2.getState() == TransportStateView.BOOKED);
 		
 		assertEquals("3", transport3.getId());
