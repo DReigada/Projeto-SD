@@ -152,10 +152,7 @@ public class BrokerPort implements BrokerPortType {
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
       }
 
-      if (job == null) { 
-        if (reason != -1) reason = 0; 
-        continue; 
-      }
+      if (job == null) continue;
 
       jobs[i] = job;
 
