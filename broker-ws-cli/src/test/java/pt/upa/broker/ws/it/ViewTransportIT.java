@@ -14,19 +14,14 @@ import pt.upa.broker.ws.UnknownTransportFault_Exception;
 
 public class ViewTransportIT extends BaseBrokerIT {
 
-	private String _id1 = null;
-
 
 	@Before
 	public void setUp() throws Exception {
-		client.clearTransports();
-		_id1 = client.requestTransport("Lisboa", "Coimbra", 7);
-
 	}
 
 	@After
 	public void tearDown() {
-		_id1 = null;
+		client.clearTransports();
 	}
 
 	// Test if the returned TransportView matches input parameters and what it should be
