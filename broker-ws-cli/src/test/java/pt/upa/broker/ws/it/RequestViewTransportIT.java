@@ -38,7 +38,7 @@ public class RequestViewTransportIT extends BaseBrokerIT {
 		assertEquals("UpaTransporter1", transport1.getTransporterCompany());
 		assertTrue(transport1.getState() == TransportStateView.BOOKED);
 	}
-	
+
 	@Test
 	public void testTwoNameCity() throws UnknownTransportFault_Exception {
 		String id = client.requestTransport("Lisboa", "Castelo Branco", 31);
@@ -46,7 +46,7 @@ public class RequestViewTransportIT extends BaseBrokerIT {
 
 		String id2 = client.requestTransport("Castelo Branco", "Lisboa", 31);
 		TransportView transport2 = client.viewTransport(id2);
-		
+
 		assertEquals("1", transport1.getId());
 		assertEquals("Lisboa", transport1.getOrigin());
 		assertEquals("Castelo Branco", transport1.getDestination());
@@ -72,7 +72,7 @@ public class RequestViewTransportIT extends BaseBrokerIT {
 
 		String id2 = client.requestTransport("Évora", "Lisboa", 31);
 		TransportView transport2 = client.viewTransport(id2);
-		
+
 		assertEquals("1", transport1.getId());
 		assertEquals("Lisboa", transport1.getOrigin());
 		assertEquals("Évora", transport1.getDestination());
@@ -87,30 +87,29 @@ public class RequestViewTransportIT extends BaseBrokerIT {
 		assertEquals("UpaTransporter1", transport2.getTransporterCompany());
 		assertTrue(transport2.getState() == TransportStateView.BOOKED);
 	}
-/*
+
 	@Test
-	public void testNullOrigin() {
+	public void testNullOrigin() throws Exception {
+
 		String nullCity = null;
+		String reply = null;
 		try{
-			String id = client.requestTransport(nullCity, "Coimbra", 31);
-			client.viewTransport(id);
-			fail();
-		} catch(BadLocationException e) {
-			assertEquals("The origin city is invalid",e.getMessage());
+			reply= client.requestTransport(nullCity, "Coimbra", 31);
+		} catch(Exception e) {
+			assertEquals("Booking failed: Location is invalid", reply);
 		}
 	}
 	
 	@Test
-	public void testNullDestination() {
+	public void testNullDestination() throws Exception {
+
 		String nullCity = null;
+		String reply = null;
 		try{
-			String id = client.requestTransport("Lisboa",nullCity, 31);
-			client.viewTransport(id);
-			fail();
-		} catch(UnknownTransportFault_Exception e) {
-			assertEquals("No transports match the given transport identifier.",e.getMessage());
+			reply= client.requestTransport("Coimbra", nullCity, 31);
+		} catch(Exception e) {
+			assertEquals("Booking failed: Location is invalid", reply);
 		}
 	}
 
-*/
 }
