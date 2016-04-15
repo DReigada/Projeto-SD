@@ -67,7 +67,22 @@ public class BrokerPort implements BrokerPortType {
 
   @Override
   public String ping(String name){
-    return "Alive: " + name;
+    Collection<TransporterClient> transporters;
+    try {
+      transporters = _transportersManager.getAllTransporterPorts();
+    } catch (JAXRException e) {
+      return name + ": Error connecting to transporters servers. Please try again.";
+    }
+
+    if (transporters == null) return name + ": No transporter companies available.";
+
+    int count = 0;
+    for (TransporterClient t : transporters) if (t.ping("Hey") == null) count++;
+
+    int good = transporters.size() - count;
+    return name + ": Connected successfully to " + good
+      + " of " + transporters.size() + " transporter companies.";
+
   }
 
   @Override
