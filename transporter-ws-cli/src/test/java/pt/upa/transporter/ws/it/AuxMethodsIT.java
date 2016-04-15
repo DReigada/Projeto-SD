@@ -1,39 +1,25 @@
-package pt.upa.transporter.ws;
+package pt.upa.transporter.ws.it;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import pt.upa.transporter.core.Transporter;
+import pt.upa.transporter.ws.JobView;
 
-public class AuxMethodsTest {
-	private TransporterPort _port = null;
+public class AuxMethodsIT extends BaseIT{
 	
-	// Set up a transporter and request two jobs
-    @Before
-    public void setUp() throws Exception {
-    	_port = new TransporterPort(new Transporter(1));
-    }
-
-    @After
-    public void tearDown() {
-    	_port = null;
-    }
-    
-    @Test
+   @Test
     public void testListJobs() throws Exception{
-    	assertTrue(_port.listJobs().isEmpty());
+    	assertTrue(transporter1.listJobs().isEmpty());
     
     	JobView[] jobArray = {
-    			_port.requestJob("Lisboa", "Faro", 50),
-    			_port.requestJob("Coimbra", "Faro", 50),
-    			_port.requestJob("Faro", "Faro", 50)};
-    	List<JobView> jobsReturned = _port.listJobs();
+    			transporter1.requestJob("Lisboa", "Faro", 50),
+    			transporter1.requestJob("Coimbra", "Faro", 50),
+    			transporter1.requestJob("Faro", "Faro", 50)};
+    	List<JobView> jobsReturned = transporter1.listJobs();
     	
     	assertTrue(jobsReturned.size() == 3);
     	
@@ -50,20 +36,20 @@ public class AuxMethodsTest {
 		}
     }
     
-    @Test
+   @Test
     public void testClearJobs() throws Exception{
-    	_port.requestJob("Lisboa", "Faro", 50);
-    	_port.requestJob("Coimbra", "Faro", 50);
-    	_port.requestJob("Faro", "Faro", 50);
+    	transporter1.requestJob("Lisboa", "Faro", 50);
+    	transporter1.requestJob("Coimbra", "Faro", 50);
+    	transporter1.requestJob("Faro", "Faro", 50);
     	
-    	_port.clearJobs();
+    	transporter1.clearJobs();
     	
-    	assertTrue(_port.listJobs().isEmpty());
+    	assertTrue(transporter1.listJobs().isEmpty());
     }
     
-    @Test
+   @Test
     public void testPingReturn(){
     	String ping = "Ping";
-    	assertEquals("Received message: " + ping ,_port.ping(ping));
+    	assertEquals("Received message: " + ping , transporter1.ping(ping));
     }
 }

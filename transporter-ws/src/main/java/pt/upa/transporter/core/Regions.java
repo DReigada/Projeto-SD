@@ -1,15 +1,13 @@
 package pt.upa.transporter.core;
 
 public class Regions {
-	public enum NorthRegion{
-		Porto, Braga, VianaCastelo, VilaReal, Braganca;
-	}
-	public enum CentreRegion{
-		Lisboa, Leiria, Santarem, CasteloBranco, Coimbra, Aveiro, Viseu, Guarda;
-	}
-	public enum SouthRegion{
-		Setubal, Evora, Portalegre, Beja, Faro;
-	}
+	
+	public final static String[] northRegion = 
+		{"Porto", "Braga", "Viana do Castelo", "Vila Real", "Bragança"};
+	public final static String[] centreRegion = 
+		{"Lisboa", "Leiria", "Santarém", "Castelo Branco", "Coimbra", "Aveiro", "Viseu", "Guarda"};
+	public final static String[] southRegion = 
+		{"Setúbal", "Évora", "Portalegre", "Beja", "Faro"};
 	
 	private Boolean _north, _centre, _south;
 	
@@ -21,16 +19,16 @@ public class Regions {
 	}
 
 	public static Boolean validateCity(String city){
-		for (Enum<NorthRegion> c : NorthRegion.values()) if(city.equals(c.name())) return true;
-		for (Enum<CentreRegion> c : CentreRegion.values()) if(city.equals(c.name())) return true;
-		for (Enum<SouthRegion> c : SouthRegion.values()) if(city.equals(c.name())) return true;
+		for (String c : northRegion) if(city.equals(c)) return true;
+		for (String c : centreRegion) if(city.equals(c)) return true;
+		for (String c : southRegion) if(city.equals(c)) return true;
 		return false;
 	}
 	
 	public Boolean hasCity(String city){
-		if(_north) for (Enum<NorthRegion> c : NorthRegion.values()) if(city.equals(c.name())) return true;
-		if(_centre) for (Enum<CentreRegion> c : CentreRegion.values()) if(city.equals(c.name())) return true;
-		if(_south) for (Enum<SouthRegion> c : SouthRegion.values()) if(city.equals(c.name())) return true;
+		if(_north) for (String c : northRegion) if(city.equals(c)) return true;
+		if(_centre) for (String c : centreRegion) if(city.equals(c)) return true;
+		if(_south) for (String c : southRegion) if(city.equals(c)) return true;
 		return false;
 	}
 }

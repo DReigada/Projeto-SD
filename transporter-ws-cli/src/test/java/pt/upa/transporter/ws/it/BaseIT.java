@@ -55,7 +55,7 @@ public class BaseIT {
     }
     
     @Before
-    public void setUp(){
+    public void setUp() throws Exception{
     	
     }
     

@@ -95,6 +95,7 @@ public class BrokerClientApplication {
 		System.out.println("Destination: ");
 		String destination = input.next();
 		System.out.println("Maximum price:");
+			
 		int price = 0;
 		while (true) {
 			try {
@@ -105,10 +106,7 @@ public class BrokerClientApplication {
 				input.next();
 				System.out.println("Insert a valid price (integer): ");
 			}
-
-
-		}		
-
+		}
 
 		//method call
 		String reply = client.requestTransport(origin, destination, price);

@@ -67,7 +67,22 @@ public class BrokerPort implements BrokerPortType {
 
   @Override
   public String ping(String name){
-    return "Alive: " + name;
+    Collection<TransporterClient> transporters;
+    try {
+      transporters = _transportersManager.getAllTransporterPorts();
+    } catch (JAXRException e) {
+      return name + ": Error connecting to transporters servers. Please try again.";
+    }
+
+    if (transporters == null) return name + ": No transporter companies available.";
+
+    int count = 0;
+    for (TransporterClient t : transporters) if (t.ping("Hey") == null) count++;
+
+    int good = transporters.size() - count;
+    return name + ": Connected successfully to " + good
+      + " of " + transporters.size() + " transporter companies.";
+
   }
 
   @Override
@@ -77,7 +92,6 @@ public class BrokerPort implements BrokerPortType {
       UnavailableTransportFault_Exception,
       UnavailableTransportPriceFault_Exception {
 
-    // TODO: check if origin and destination are known
 
     if (price < 0){ 
       InvalidPriceFault faultInfo = new InvalidPriceFault();
@@ -89,17 +103,20 @@ public class BrokerPort implements BrokerPortType {
     try {
       temp = _transportersManager.getAllTransporterPorts();
 
+      if (temp == null){ 
+        UnavailableTransportFault faultInfo = new UnavailableTransportFault();
+        faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
+        throw new UnavailableTransportFault_Exception("No transporter companies available.", faultInfo);
+      }
+
     } catch (JAXRException e) {
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("Error connecting to transporters. PLease try again.", faultInfo);
     }
+
     List<TransporterClient> transporters = new ArrayList<TransporterClient>(temp);
-    if (transporters == null){ 
-      UnavailableTransportFault faultInfo = new UnavailableTransportFault();
-      faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
-      throw new UnavailableTransportFault_Exception("No transporter companies available.", faultInfo);
-    }
+    
 
     // saves transporter proposals status
     // 1 = no job for that price; 
@@ -108,13 +125,16 @@ public class BrokerPort implements BrokerPortType {
     int reason = 0; 
 
     int bestPrice = Integer.MAX_VALUE, bestJobIndex = 0;
+    JobView bestJob = null;
 
     int previousNumberTransports = _transports.size();
+    BrokerTransportView transport = new BrokerTransportView(previousNumberTransports+"", origin, destination);
+    transport.setTransportState(TransportStateView.REQUESTED);
+    _transports.add(transport);
+
+    JobView[] jobs = new JobView[transporters.size()];
 
     for (int i=0; i<transporters.size(); ++i){
-      int thisIndex = previousNumberTransports+i;
-      BrokerTransportView transport = new BrokerTransportView(thisIndex+"", origin, destination);
-      _transports.add(transport);
 
       TransporterClient port = transporters.get(i);
 
@@ -122,64 +142,52 @@ public class BrokerPort implements BrokerPortType {
       try {
         job = port.requestJob(origin, destination, price);
       } catch (BadLocationFault_Exception e) {
-        _transports.set(thisIndex, null); 
+        transport.setTransportState(TransportStateView.FAILED); 
         UnknownLocationFault faultInfo = new UnknownLocationFault();
         throw new UnknownLocationFault_Exception("Unknown origin or destination.", faultInfo);
 
       } catch (BadPriceFault_Exception e) {
-        _transports.set(thisIndex, null); 
+        transport.setTransportState(TransportStateView.FAILED); 
         InvalidPriceFault faultInfo = new InvalidPriceFault();
         faultInfo.setPrice(price);
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
       }
 
-      if (job == null){
-        _transports.set(thisIndex, null); 
-        if (reason != -1) reason = 0; 
-        continue;
-      }
-      
-      transport.setTransportState(TransportStateView.BUDGETED);
-      transport.setTransportCompany(job.getCompanyName());
-      transport.setTransportPrice(job.getJobPrice());
-      transport.setTransporterId(job.getJobIdentifier());
+      if (job == null && reason != -1){ reason = 0; continue; }
+
+      jobs[i] = job;
 
       int proposedPrice = job.getJobPrice();
 
-      if (proposedPrice > price){ 
-        transport.setTransportState(TransportStateView.FAILED);
-        if (reason != -1) reason = 1; 
-      }
-      else reason = -1;
+      reason = (proposedPrice > price && reason != -1 ? 1 : -1);
         
       if (proposedPrice < bestPrice) {
         bestPrice = proposedPrice;
-        bestJobIndex = thisIndex;
+        bestJob = job;
+        bestJobIndex = i;
       }
     }
 
+    transport.setTransportState(TransportStateView.BUDGETED);
+    transport.setTransportCompany(bestJob.getCompanyName());
+    transport.setTransportPrice(bestJob.getJobPrice());
+    transport.setTransporterId(bestJob.getJobIdentifier());
+
     if (reason == 0) {
+      transport.setTransportState(TransportStateView.FAILED);
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("No transport available for the requested route.", faultInfo);
     }
-    if (reason == 1) {
-      UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
-      faultInfo.setBestPriceFound(bestPrice);
-      throw new UnavailableTransportPriceFault_Exception("No transport available for the requested price.", faultInfo); 
-    }
 
     for (int i=0; i<transporters.size(); ++i){
-      int thisIndex = previousNumberTransports+i;
-      BrokerTransportView transport = _transports.get(thisIndex);
-      if (transport == null) continue;
 
       TransporterClient port = transporters.get(i);
-      boolean isAccepted = thisIndex == bestJobIndex;
+      JobView job = jobs[i];
 
-      TransportStateView state 
-          = (isAccepted ? TransportStateView.BOOKED : TransportStateView.FAILED);
-      transport.setTransportState(state);
+      if (job == null) continue;
+
+      boolean isAccepted = reason == -1 && i == bestJobIndex;
       
       try {
         port.decideJob(transport.getTransporterId(), isAccepted);
@@ -191,7 +199,16 @@ public class BrokerPort implements BrokerPortType {
         }
       }
     }
-    return bestJobIndex + "";
+
+    if (reason == -1) transport.setTransportState(TransportStateView.BOOKED);
+    else {
+      transport.setTransportState(TransportStateView.FAILED);
+      UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
+      faultInfo.setBestPriceFound(bestPrice);
+      throw new UnavailableTransportPriceFault_Exception("No transport available for the requested price.", faultInfo); 
+    }
+
+    return previousNumberTransports + "";
   }
 
   @Override

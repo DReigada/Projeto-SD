@@ -98,6 +98,24 @@ public abstract class RequestJobTest {
 		assertEquals(_ID % 2 == 0, _port.requestJob("Faro", "Lisboa", 10) == null);
     }
 	
+	/**
+	 * The following tests test the cities with special names (accentuated, multiple worded)
+	 */
+	@Test
+    public void testAccentuatedCityName() throws Exception {
+		String city = "Santarém";
+		JobView job = _port.requestJob(city, "Lisboa", 10);
+    	assertEquals(city, job.getJobOrigin());
+    }
+	@Test
+    public void testMultipleWordedCityName() throws Exception {
+		String city = "Castelo Branco";
+		JobView job = _port.requestJob(city, "Lisboa", 10);
+    	assertEquals(city, job.getJobOrigin());
+    }
+	
+	
+	
     /**
      * The following tests test if the transporter throws 
      * BadLocationFault_Exception if the origin/destination is not valid

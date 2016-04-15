@@ -73,6 +73,7 @@ public class DecideJobTest {
     
     // Test if the returned jobView match the ones return by requestJob
     // and that the state was changed 
+    @Test
     public void testAcceptAndRejectTwoJobs() throws Exception{
     	JobView job1 = _port.decideJob("1", false);
     	JobView job2 = _port.decideJob("2", true);
