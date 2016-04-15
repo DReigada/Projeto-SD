@@ -77,7 +77,6 @@ public class BrokerPort implements BrokerPortType {
       UnavailableTransportFault_Exception,
       UnavailableTransportPriceFault_Exception {
 
-    // TODO: check if origin and destination are known
 
     if (price < 0){ 
       InvalidPriceFault faultInfo = new InvalidPriceFault();
