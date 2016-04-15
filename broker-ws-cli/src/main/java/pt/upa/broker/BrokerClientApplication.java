@@ -8,10 +8,10 @@ import pt.upa.broker.ws.UnknownTransportFault_Exception;
 import pt.upa.broker.ws.cli.BrokerClient;
 
 public class BrokerClientApplication {
-	
+
 	static BrokerClient client;
 
-	
+
 	public static void main(String[] args) throws Exception {
 		client = new BrokerClient();
 
@@ -35,7 +35,7 @@ public class BrokerClientApplication {
 			default:
 				System.out.println("invalid option, please select 'y' or 'n'");
 				break;
-			} 
+			}
 		}
 
 	}
@@ -78,10 +78,10 @@ public class BrokerClientApplication {
 			default:
 				System.out.println("invalid option");
 				break;
-			} 
+			}
 		}
 	}
-	
+
 	/*
 	 * MAIN OPERATIONS: REQUEST TRANSPORT, VIEW TRANSPORT
 	 */
@@ -105,13 +105,16 @@ public class BrokerClientApplication {
 				input.next();
 				System.out.println("Insert a valid price (integer): ");
 			}
+
+
 		}		
+
+
 		//method call
 		String reply = client.requestTransport(origin, destination, price);
 		//response from broker
 		System.out.println(reply);
 	}
-	
 
 	private static void view() {
 		//id input from user
@@ -119,7 +122,6 @@ public class BrokerClientApplication {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please insert the id of the transport service in question:");
 		String id = input.next();
-
 		//method call. it may fail if the transport id requested does not exist
 		try {
 			//calls printTransportInfo method that organises and prints the requested info
@@ -129,30 +131,30 @@ public class BrokerClientApplication {
 			System.out.println("Unknown transport id");
 		}
 	}
-	
 
-	
+
+
 	/*
 	 * AUXILIARY OPERATIONS: PING, LIST TRANPORTS, CLEAR TRANSPORTS
 	 */
 	private static void ping() {
 		System.out.println("Client asking: Are you alive?");
-		System.out.println("Broker reply: " + client.ping("Are you alive?"));		
+		System.out.println("Broker reply: " + client.ping("Are you alive?"));
 	}
 
 	private static void list() {
 		for(TransportView element : client.listTransports()){
 			printTransportInfo(element);
 		}
-	
+
 	}
-	
+
 	private static void clear() {
 		client.clearTransports();
-		System.out.println("All transports have been eliminated");		
+		System.out.println("All transports have been eliminated");
 	}
-	
-	
+
+
 	//auxiliary method to print the transport info to the screen
 	private static void printTransportInfo(TransportView transport) {
 		System.out.println("----------------------------------");
