@@ -1,6 +1,6 @@
 package pt.upa.broker.ws.it;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class clearTransportsIT extends BaseBrokerIT {
 		
     	client.clearTransports();
     	
-    	assertEquals(0, client.listTransports().size());
+    	assertTrue(client.listTransports().isEmpty());
 		
     }
 }
