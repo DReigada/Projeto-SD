@@ -89,17 +89,20 @@ public class BrokerPort implements BrokerPortType {
     try {
       temp = _transportersManager.getAllTransporterPorts();
 
+      if (temp == null){ 
+        UnavailableTransportFault faultInfo = new UnavailableTransportFault();
+        faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
+        throw new UnavailableTransportFault_Exception("No transporter companies available.", faultInfo);
+      }
+
     } catch (JAXRException e) {
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("Error connecting to transporters. PLease try again.", faultInfo);
     }
+
     List<TransporterClient> transporters = new ArrayList<TransporterClient>(temp);
-    if (transporters == null){ 
-      UnavailableTransportFault faultInfo = new UnavailableTransportFault();
-      faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
-      throw new UnavailableTransportFault_Exception("No transporter companies available.", faultInfo);
-    }
+    
 
     // saves transporter proposals status
     // 1 = no job for that price; 
