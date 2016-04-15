@@ -33,7 +33,7 @@ public class ListTransportsIT extends BaseBrokerIT {
 		
 		for (int i=0; i<3; ++i) {
 			TransportView test = test_transports.get(i);
-			TransportView actual = actual_transports.get(i);
+			TransportView actual = actual_transports[i];
 			
 			assertEquals(actual.getDestination(), test.getDestination());
 			assertEquals(actual.getPrice(), test.getPrice());
