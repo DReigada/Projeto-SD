@@ -129,16 +129,16 @@ public class ViewTransportTest extends BaseTest {
     }
 	
 	/* TESTS VALID ID */
-	// TEST: only one element in _transports (valid)
+	// TEST: only one transport in _transports an a valid one
 	@Test
-    public void testViewTransportWithOneValidElement() throws Exception{
+    public void testViewTransportWithOneValidTransport() throws Exception{
     	
     	new Expectations(){{
     		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
     		transporter.requestJob(anyString, anyString, anyInt);
     		result = _jobView1;
     		manager.getTransporterPort(anyString); result = transporter;
-    		transporter.jobStatus(anyString); result = _jobView2;
+    		transporter.jobStatus(anyString); result = _jobViewAccepted;
     	}};
     	
     	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_2);
@@ -158,9 +158,10 @@ public class ViewTransportTest extends BaseTest {
     		transporter.jobStatus(anyString); times = 1;
     	}};
     }
-	// TEST: only one element in _transports (invalid)
+	
+	// TEST: only one transport in _transports and an invalid one
 	@Test
-    public void testViewTransportWithOneInvalidElement() throws Exception{
+    public void testViewTransportWithOneInvalidTransport() throws Exception{
     	
     	new Expectations(){{
     		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
@@ -168,7 +169,10 @@ public class ViewTransportTest extends BaseTest {
     		result = _jobView2;
     	}};
     	
-    	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
+    	try{
+    		_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1);
+    	} catch (Exception e){}
+    	
     	TransportView transport1 = _broker.viewTransport(ID_1);
 		
     	assertEquals(ID_1, transport1.getId());
@@ -185,12 +189,100 @@ public class ViewTransportTest extends BaseTest {
     	}};
     }
 	
-	// TEST: only one element in _transports (valid) with transport price = reference price
-	// TEST: two valid transports, check one of them
-	// TEST: two invalid transports, check one of them
-	// TEST: one invalid one valid, test the invalid one
-	// TEST: one invalid one valid, test the valid one
-	// TEST if manager returns null - company stopped business
+	// TEST: two valid transports, check one
+	@Test
+    public void testViewTransportWithTwoValidTransports() throws Exception{
+    	
+    	new Expectations(){{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		
+    		transporter.requestJob(anyString, anyString, anyInt);
+    		result = _jobView1;
+    		transporter.requestJob(anyString, anyString, anyInt);
+    		result = _jobView2;
+    		
+    		manager.getTransporterPort(anyString); result = transporter;
+    		transporter.jobStatus(anyString); result = _jobViewAccepted;
+    	}};
+    	
+    	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_3);
+    	_broker.requestTransport(ORIGIN_2, DESTINATION_2, PRICE_3);
+    	TransportView transport1 = _broker.viewTransport(ID_2);
+		
+    	assertEquals(ID_2, transport1.getId());
+		assertEquals(ORIGIN_2, transport1.getOrigin());
+		assertEquals(DESTINATION_2, transport1.getDestination());
+		assertTrue(PRICE_2 == transport1.getPrice());
+		assertEquals(COMPANY_1_NAME, transport1.getTransporterCompany());
+		
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 2;
+    		transporter.requestJob(anyString, anyString, anyInt); times = 2;
+    		manager.getTransporterPort(anyString); times = 1;
+    		transporter.jobStatus(anyString); times = 1;
+    	}};
+    }
 	
-	// TEST: all transport states
+	// TEST if manager returns null - company stopped business
+	@Test
+    public void testViewTransportAfterCompanyLeft() throws Exception{
+    	
+    	new Expectations(){{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		
+    		transporter.requestJob(anyString, anyString, anyInt);
+    		result = _jobView1;
+    		
+    		manager.getTransporterPort(anyString); result = null;
+    	}};
+    	
+    	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_3);
+    	TransportView transport1 = _broker.viewTransport(ID_1);
+		
+    	assertEquals(ID_1, transport1.getId());
+		assertEquals(ORIGIN_1, transport1.getOrigin());
+		assertEquals(DESTINATION_1, transport1.getDestination());
+		assertTrue(PRICE_1 == transport1.getPrice());
+		assertEquals(COMPANY_1_NAME, transport1.getTransporterCompany());
+		assertEquals(TransportStateView.COMPLETED, transport1.getState());
+		
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 1;
+    		transporter.requestJob(anyString, anyString, anyInt); times = 1;
+    		manager.getTransporterPort(anyString); times = 1;
+    	}};
+    }
+	
+	// TEST: a transport that is ongoing
+	@Test
+    public void testViewTransportOngoing() throws Exception{
+    	
+    	new Expectations(){{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		transporter.requestJob(anyString, anyString, anyInt);
+    		result = _jobView1;
+    		manager.getTransporterPort(anyString); result = transporter;
+    		transporter.jobStatus(anyString); result = _jobViewOngoing;
+    	}};
+    	
+    	_broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_2);
+    	TransportView transport1 = _broker.viewTransport(ID_1);
+		
+    	assertEquals(ID_1, transport1.getId());
+		assertEquals(ORIGIN_1, transport1.getOrigin());
+		assertEquals(DESTINATION_1, transport1.getDestination());
+		assertTrue(PRICE_1 == transport1.getPrice());
+		assertEquals(COMPANY_1_NAME, transport1.getTransporterCompany());
+		assertEquals(TransportStateView.ONGOING, transport1.getState());
+    	
+		
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 1;
+    		transporter.requestJob(anyString, anyString, anyInt); times = 1;
+    		manager.getTransporterPort(anyString); times = 1;
+    		transporter.jobStatus(anyString); times = 1;
+    	}};
+    }
+	
 }
