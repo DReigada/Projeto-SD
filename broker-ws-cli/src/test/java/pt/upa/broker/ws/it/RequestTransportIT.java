@@ -2,12 +2,24 @@ package pt.upa.broker.ws.it;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class RequestTransportIT extends BaseBrokerIT {
 	// tests
 	// assertEquals(expected, actual);
+	
+	@Before
+	public void setUp() throws Exception {
+		
+	}
 
+	@After
+	public void tearDown() {
+		client.clearTransports();
+	}
+	
 	/**
      * The following tests test if the broker throws 
      * UnknownLocationFault_Exception if the origin/destination is not valid
