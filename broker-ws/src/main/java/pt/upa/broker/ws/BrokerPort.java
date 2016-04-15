@@ -152,7 +152,10 @@ public class BrokerPort implements BrokerPortType {
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
       }
 
-      if (job == null && reason != -1){ reason = 0; continue; }
+      if (job == null) { 
+        if (reason != -1) reason = 0; 
+        continue; 
+      }
 
       jobs[i] = job;
 
@@ -327,6 +330,8 @@ public class BrokerPort implements BrokerPortType {
             case ONGOING:   validState = TransportStateView.ONGOING;
                             break;
             case COMPLETED: validState = TransportStateView.COMPLETED;
+                            break;
+            case ACCEPTED: validState = TransportStateView.BOOKED;
                             break;
             default:  UnknownTransportFault faultInfo = new UnknownTransportFault();
                       throw new UnknownTransportFault_Exception("Invalid state" +
