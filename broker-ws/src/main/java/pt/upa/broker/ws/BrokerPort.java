@@ -76,7 +76,7 @@ public class BrokerPort implements BrokerPortType {
     if (transporters == null) return name + ": No transporter companies available.";
 
     int count = 0;
-    for (TransporterClient t : transporters) if (t.ping("Hey") == null) count++;
+    for (TransporterClient t : transporters) if (t.ping(name) == null) count++;
 
     int good = transporters.size() - count;
     return name + ": Connected successfully to " + good
