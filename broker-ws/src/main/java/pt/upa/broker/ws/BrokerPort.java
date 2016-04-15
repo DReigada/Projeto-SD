@@ -143,6 +143,7 @@ public class BrokerPort implements BrokerPortType {
       } catch (BadLocationFault_Exception e) {
         transport.setTransportState(TransportStateView.FAILED); 
         UnknownLocationFault faultInfo = new UnknownLocationFault();
+        faultInfo.setLocation(e.getFaultInfo().getLocation());
         throw new UnknownLocationFault_Exception("Unknown origin or destination.", faultInfo);
 
       } catch (BadPriceFault_Exception e) {

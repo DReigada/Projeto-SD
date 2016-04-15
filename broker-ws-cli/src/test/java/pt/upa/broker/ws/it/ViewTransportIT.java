@@ -28,13 +28,13 @@ public class ViewTransportIT extends BaseBrokerIT {
 	@Test
 	public void testWithExistingID() throws UnknownTransportFault_Exception {
 		String id = client.requestTransport("Lisboa", "Coimbra", 32);
-		TransportView transport1 = client.viewTransport("1");
+		TransportView transport1 = client.viewTransport(id);
 		
 		assertEquals("1", transport1.getId());
 		assertEquals("Lisboa", transport1.getOrigin());
 		assertEquals("Coimbra", transport1.getDestination());
 		assertTrue(transport1.getPrice() > 0);
-		assertEquals("UpaTransporter1", transport1.getTransporterCompany());
+		assertEquals("UpaTransporter2", transport1.getTransporterCompany());
 		assertTrue(transport1.getState() == TransportStateView.BOOKED);
 
 	}
