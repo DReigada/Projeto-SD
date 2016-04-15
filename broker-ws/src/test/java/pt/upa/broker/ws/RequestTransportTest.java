@@ -54,6 +54,24 @@ public class RequestTransportTest extends BaseTest{
     }
     
     @Test
+    public void testRequestOnTwoTransporters() throws Exception{
+    	new Expectations() {{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter, transporter2);
+    		transporter.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); result = _jobView1;
+    		transporter2.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); result = _jobView2;
+    	}};
+    	
+    	String id = _broker.requestTransport(ORIGIN_1, DESTINATION_1, PRICE_1); 	
+    	assertEquals("1", id);
+    	
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 1;
+    		transporter.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); times = 1;
+    		transporter2.requestJob(ORIGIN_1, DESTINATION_1, PRICE_1); times = 1;
+    	}};
+    }
+    
+    @Test
     public void testRequestTransportWithInvalidLocation() throws Exception{
     	BadLocationFault fault = new BadLocationFault();
     	fault.setLocation(BAD_LOCATION);
