@@ -97,6 +97,31 @@ public class RequestTransportTest extends BaseTest{
     }
     
     @Test
+    public void testRequestTransportWithNullLocation() throws Exception{
+    	BadLocationFault fault = new BadLocationFault();
+    	fault.setLocation(null);
+    	
+    	new Expectations(){{
+    		manager.getAllTransporterPorts(); result = Arrays.asList(transporter);
+    		transporter.requestJob(null, DESTINATION_1, PRICE_1);
+    		result = new BadLocationFault_Exception(ERROR_MESSAGE_1, fault);
+    	}};
+    	
+    	try {
+			_broker.requestTransport(null, DESTINATION_1, PRICE_1);
+			fail();
+		} catch (UnknownLocationFault_Exception e) {
+			assertEquals("Unknown origin or destination.", e.getMessage());
+			assertEquals(null, e.getFaultInfo().getLocation());
+		}
+    	
+    	new Verifications() {{
+    		manager.getAllTransporterPorts(); times = 1;
+    		transporter.requestJob(null, DESTINATION_1, PRICE_1); times = 1;
+    	}};
+    }
+    
+    @Test
     public void testRequestTransportWithInvalidPrice() throws Exception{
     	BadPriceFault fault = new BadPriceFault();
     	fault.setPrice(BAD_PRICE);
