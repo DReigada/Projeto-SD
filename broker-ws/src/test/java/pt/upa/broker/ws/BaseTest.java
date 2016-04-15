@@ -25,12 +25,14 @@ public class BaseTest {
 	public static final String ORIGIN_2 = "Coimbra";
 	public static final String DESTINATION_1 = "Castelo Branco";
 	public static final String DESTINATION_2 = "Santarém";
+	public static final String BAD_LOCATION = "not a city";
 	public static final int PRICE_1 = 5;
 	public static final int PRICE_2 = 8;
 	public static final String ID_1 = "1";
 	public static final String ID_2 = "2";
 	public static final JobStateView STATE_1 = JobStateView.PROPOSED;
 	public static final JobStateView STATE_2 = JobStateView.PROPOSED;
+	public static final String ERROR_MESSAGE_1= "error message";
 	
 	// the JobViews created to mock transporters responses
 	protected static JobView _jobView1, _jobView2;
