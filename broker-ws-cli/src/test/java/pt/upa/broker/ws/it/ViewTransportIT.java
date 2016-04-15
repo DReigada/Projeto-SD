@@ -28,7 +28,10 @@ public class ViewTransportIT extends BaseBrokerIT {
 	// Test if the returned TransportView matches input Parameters and what it should be
 	@Test
 	public void testWithExistingID() throws UnknownTransportFault_Exception {
-		String id = client.requestTransport("Lisboa", "Coimbra", 31);
+
+		int price = 32;
+		String id = client.requestTransport("Lisboa", "Coimbra", price);
+
 		TransportView transport1 = client.viewTransport(id);
 		
 		String id2 = client.requestTransport("Viseu", "Guarda", 32);
@@ -40,8 +43,10 @@ public class ViewTransportIT extends BaseBrokerIT {
 		assertEquals("1", transport1.getId());
 		assertEquals("Lisboa", transport1.getOrigin());
 		assertEquals("Coimbra", transport1.getDestination());
-		assertTrue(transport1.getPrice() > 0);
-		assertEquals("UpaTransporter1", transport1.getTransporterCompany());
+
+		assertTrue(transport1.getPrice() <= price);
+		assertEquals("UpaTransporter2", transport1.getTransporterCompany());
+
 		assertTrue(transport1.getState() == TransportStateView.BOOKED);
 
 		assertEquals("2", transport2.getId());

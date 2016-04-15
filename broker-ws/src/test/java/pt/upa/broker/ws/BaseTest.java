@@ -28,15 +28,22 @@ public class BaseTest {
 	public static final String BAD_LOCATION = "not a city";
 	public static final int PRICE_1 = 5;
 	public static final int PRICE_2 = 8;
+	public static final int PRICE_3 = 10;
 	public static final int BAD_PRICE = -7;
 	public static final String ID_1 = "1";
 	public static final String ID_2 = "2";
+	public static final String INVALID_ID_1 = "invalid";
+	public static final String INVALID_ID_2 = "0";
+	public static final String INVALID_ID_3 = "3";
 	public static final JobStateView STATE_1 = JobStateView.PROPOSED;
-	public static final JobStateView STATE_2 = JobStateView.PROPOSED;
+	public static final JobStateView STATE_2 = JobStateView.ACCEPTED;
+	public static final JobStateView STATE_ONGOING = JobStateView.ONGOING;
+	public static final JobStateView STATE_COMPLETED = JobStateView.COMPLETED;
 	public static final String ERROR_MESSAGE_1= "error message";
 	
 	// the JobViews created to mock transporters responses
-	protected static JobView _jobView1, _jobView2, _jobViewTransporter2;
+	protected static JobView _jobView1, _jobView2, _jobViewTransporter2, 
+							_jobViewCompleted, _jobViewAccepted, _jobViewOngoing;
 	
 	// initialize the jobViews
 	@BeforeClass
@@ -56,6 +63,30 @@ public class BaseTest {
 		_jobView2.setJobIdentifier(ID_2);
 		_jobView2.setJobPrice(PRICE_2);
 		_jobView2.setJobState(STATE_2);
+		
+		_jobViewAccepted = new JobView();
+		_jobViewAccepted.setCompanyName(COMPANY_1_NAME);
+		_jobViewAccepted.setJobOrigin(ORIGIN_1);
+		_jobViewAccepted.setJobDestination(DESTINATION_1);
+		_jobViewAccepted.setJobIdentifier(ID_1);
+		_jobViewAccepted.setJobPrice(PRICE_1);
+		_jobViewAccepted.setJobState(STATE_2);
+		
+		_jobViewOngoing = new JobView();
+		_jobViewOngoing.setCompanyName(COMPANY_1_NAME);
+		_jobViewOngoing.setJobOrigin(ORIGIN_1);
+		_jobViewOngoing.setJobDestination(DESTINATION_1);
+		_jobViewOngoing.setJobIdentifier(ID_1);
+		_jobViewOngoing.setJobPrice(PRICE_1);
+		_jobViewOngoing.setJobState(STATE_ONGOING);
+		
+		_jobViewCompleted = new JobView();
+		_jobViewCompleted.setCompanyName(COMPANY_1_NAME);
+		_jobViewCompleted.setJobOrigin(ORIGIN_1);
+		_jobViewCompleted.setJobDestination(DESTINATION_1);
+		_jobViewCompleted.setJobIdentifier(ID_1);
+		_jobViewCompleted.setJobPrice(PRICE_1);
+		_jobViewCompleted.setJobState(STATE_COMPLETED);
 		
 		_jobViewTransporter2 = new JobView();
 		_jobViewTransporter2.setCompanyName(COMPANY_2_NAME);
