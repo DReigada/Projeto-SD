@@ -39,7 +39,7 @@ public class BaseTest {
 	public static final String ERROR_MESSAGE_1= "error message";
 	
 	// the JobViews created to mock transporters responses
-	protected static JobView _jobView1, _jobView2;
+	protected static JobView _jobView1, _jobView2, _jobViewTransporter2;
 	
 	// initialize the jobViews
 	@BeforeClass
@@ -59,6 +59,14 @@ public class BaseTest {
 		_jobView2.setJobIdentifier(ID_2);
 		_jobView2.setJobPrice(PRICE_2);
 		_jobView2.setJobState(STATE_2);
+		
+		_jobViewTransporter2 = new JobView();
+		_jobViewTransporter2.setCompanyName(COMPANY_2_NAME);
+		_jobViewTransporter2.setJobOrigin(ORIGIN_1);
+		_jobViewTransporter2.setJobDestination(DESTINATION_1);
+		_jobViewTransporter2.setJobIdentifier(ID_1);
+		_jobViewTransporter2.setJobPrice(PRICE_2);
+		_jobViewTransporter2.setJobState(STATE_1);
 	}
 	
 	@AfterClass
@@ -70,6 +78,8 @@ public class BaseTest {
 
 	@Mocked
 	protected TransporterClient transporter;
+	@Mocked
+	protected TransporterClient transporter2;
 	@Mocked 
 	protected TransporterCompaniesManager manager;
 	

@@ -95,6 +95,7 @@ public class BrokerClientApplication {
 		System.out.println("Destination: ");
 		String destination = input.next();
 		System.out.println("Maximum price:");
+			
 		int price = 0;
 		while (true) {
 			try {
@@ -106,6 +107,7 @@ public class BrokerClientApplication {
 				System.out.println("Insert a valid price (integer): ");
 			}
 		}
+
 		//method call
 		String reply = client.requestTransport(origin, destination, price);
 		//response from broker
@@ -121,7 +123,8 @@ public class BrokerClientApplication {
 		//method call. it may fail if the transport id requested does not exist
 		try {
 			//calls printTransportInfo method that organises and prints the requested info
-			printTransportInfo(client.viewTransport(id));
+			TransportView transport = client.viewTransport(id);
+			printTransportInfo(transport);
 		} catch (UnknownTransportFault_Exception e) {
 			System.out.println("Unknown transport id");
 		}
@@ -138,11 +141,8 @@ public class BrokerClientApplication {
 	}
 
 	private static void list() {
-		//gets the list of transports
-		//gets the information regarding each transport
-		//calls the method to print the requested information to the screen
 		for(TransportView element : client.listTransports()){
-			printTransportInfo(client.getTransportInfo(element));
+			printTransportInfo(element);
 		}
 
 	}
@@ -154,14 +154,14 @@ public class BrokerClientApplication {
 
 
 	//auxiliary method to print the transport info to the screen
-	private static void printTransportInfo(String[] transport) {
+	private static void printTransportInfo(TransportView transport) {
 		System.out.println("----------------------------------");
-		System.out.println("Transport ID: " + transport[0]);
-		System.out.println("Origin: " + transport[1]);
-		System.out.println("Destination: " + transport[2]);
-		System.out.println("Price: " + transport[3]);
-		System.out.println("Transporter Company: " + transport[4]);
-		System.out.println("State: " + transport[5]);
+		System.out.println("Transport ID: " + transport.getId());
+		System.out.println("Origin: " + transport.getOrigin());
+		System.out.println("Destination: " + transport.getDestination());
+		System.out.println("Price: " + transport.getPrice());
+		System.out.println("Transporter Company: " + transport.getTransporterCompany());
+		System.out.println("State: " + transport.getState());
 		System.out.println("----------------------------------");
 		System.out.println();
 	}
