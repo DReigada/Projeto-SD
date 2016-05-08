@@ -15,6 +15,11 @@ public class BrokerTransportView {
 
       _transportView = t;
     }
+    
+    public BrokerTransportView(TransportView transportView, String transporterID){
+    	_transportView = transportView;
+    	_transporterId = transporterID;
+    }
 
     // Transport view attribute setters
     public void setTransportPrice(int price) { _transportView.setPrice(price); }
