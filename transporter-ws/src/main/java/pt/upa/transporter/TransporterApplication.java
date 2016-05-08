@@ -1,5 +1,7 @@
 package pt.upa.transporter;
 
+import javax.jws.HandlerChain;
+
 import pt.upa.transporter.core.Transporter;
 import pt.upa.transporter.ws.TransporterEndpoint;
 

@@ -4,7 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
+import javax.xml.ws.WebServiceContext;
 
 import pt.upa.transporter.core.Job;
 import pt.upa.transporter.core.Job.State;
@@ -16,7 +19,13 @@ import pt.upa.transporter.simulator.JobStateSimulator;
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType"
 	)
+@HandlerChain(file = "/handler-chain.xml")
 public class TransporterPort implements TransporterPortType{
+	
+	
+	@Resource
+	private WebServiceContext webServiceContext;
+	
 	
 	Transporter _transporter;
 	public JobStateSimulator _jobSimulator;
