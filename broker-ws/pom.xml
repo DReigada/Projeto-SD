@@ -27,9 +27,9 @@
 		<backupws.interface>pt.upa.broker.backup.ws.BrokerBackup</backupws.interface>
 		<backupws.wsdl.directory>src/main/resources</backupws.wsdl.directory>
         <backupws.wsdl.filename>BrokerBackup.wsdl</backupws.wsdl.filename>
+        <backupws.url>http://localhost:8079/broker-ws/endpoint</backupws.url>
         
         <ws.url>http://localhost:8080/broker-ws/endpoint</ws.url>
-
         <ws.name>UpaBroker</ws.name>
         <uddi.url>http://localhost:9090</uddi.url>
     </properties>
@@ -111,28 +111,6 @@
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- to prevent deprecation warning: -->
-                    <killAfter>-1</killAfter>
-                    <mainClass>${mainclass}</mainClass>
-                    <arguments>
-                        <argument>${uddi.url}</argument>
-                        <argument>${ws.name}</argument>
-                        <argument>${ws.url}</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
                 <version>1.10</version>
                 <executions>
@@ -154,4 +132,69 @@
             </plugin> 
         </plugins>
     </build>
+    <profiles>
+    	<profile>
+    		<id>main-broker</id>
+    		<activation>
+    			<activeByDefault>true</activeByDefault>
+    		</activation>
+    		<build>
+    			<plugins>
+					<plugin>
+		                <groupId>org.codehaus.mojo</groupId>
+		                <artifactId>exec-maven-plugin</artifactId>
+		                <version>1.4.0</version>
+		                <executions>
+		                    <execution>
+		                        <goals>
+		                            <goal>java</goal>
+		                        </goals>
+		                    </execution>
+		                </executions>
+		                <configuration>
+		                    <!-- to prevent deprecation warning: -->
+		                    <killAfter>-1</killAfter>
+		                    <mainClass>${mainclass}</mainClass>
+		                    <arguments>
+		                        <argument>${uddi.url}</argument>
+		                        <argument>${ws.name}</argument>
+		                        <argument>${ws.url}</argument>
+		                        <argument>n</argument>
+		                    </arguments>
+		                </configuration>
+		           	</plugin>
+    			</plugins>
+    		</build>
+    	</profile>
+    	<profile>
+    		<id>backup-broker</id>
+    		<build>
+    			<plugins>
+					<plugin>
+		                <groupId>org.codehaus.mojo</groupId>
+		                <artifactId>exec-maven-plugin</artifactId>
+		                <version>1.4.0</version>
+		                <executions>
+		                    <execution>
+		                        <goals>
+		                            <goal>java</goal>
+		                        </goals>
+		                    </execution>
+		                </executions>
+		                <configuration>
+		                    <!-- to prevent deprecation warning: -->
+		                    <killAfter>-1</killAfter>
+		                    <mainClass>${mainclass}</mainClass>
+		                    <arguments>
+		                        <argument>${uddi.url}</argument>
+		                        <argument>${ws.name}</argument>
+		                        <argument>${backupws.url}</argument>
+		                        <argument>y</argument>
+		                    </arguments>
+		                </configuration>
+		           	</plugin>
+    			</plugins>
+    		</build>
+    	</profile>
+    </profiles>
 </project>
