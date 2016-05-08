@@ -13,6 +13,8 @@ public class Broker {
     
     private EndpointManager _endpoint;
     
+    public static final String BACKUP_NAME_SUFIX = "Backup";
+    
 	public Broker(String uddiURL, String name, String url, boolean isBackup) {
 		_uddiURL = uddiURL;
 		_name = name;
@@ -27,14 +29,26 @@ public class Broker {
 		}
 	}
 	
-	public void start() throws JAXRException{
-      // publish endpoint
-      System.out.printf("Starting %s%n", _url);
-      _endpoint.start(_url);
-
-      // publish to UDDI
-      System.out.printf("Publishing '%s' to UDDI at %s%n", _name, _uddiURL);
-      _endpoint.awaitConnections(_name);
+	public void start(boolean useBackup) throws JAXRException{
+		String name = _name;
+	
+	// publish endpoint
+	  System.out.printf("Starting %s%n", _url);
+	  _endpoint.start(_url);
+	  
+	  if(useBackup){
+		  // connect to backup
+	  System.out.println("Connecting to Backup server");
+		  _endpoint.connectToBackup(_name + BACKUP_NAME_SUFIX);
+	  }
+	  
+	  if(_isBackup){
+		  name += Broker.BACKUP_NAME_SUFIX;
+	  }
+	  
+	  // publish to UDDI
+	  System.out.printf("Publishing '%s' to UDDI at %s%n", name, _uddiURL);
+	  _endpoint.awaitConnections(name);
 	}
 	
 	public void stop(){
