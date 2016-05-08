@@ -291,6 +291,11 @@ public class BrokerPort implements BrokerPortType {
     _transports = new ArrayList<BrokerTransportView>();
 
   }
+  
+  public void addTransport(BrokerTransportView transport){
+	  _transports.add(transport);
+  }
+  
 
   private TransportStateView convertToTransportStateView(JobStateView state) throws 
       UnknownTransportFault_Exception {
