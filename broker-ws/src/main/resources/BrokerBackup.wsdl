@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="BrokerBackupService" targetNamespace="http://ws.backup.broker.upa.pt/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.backup.broker.upa.pt/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<xs:schema xmlns:tns="http://ws.broker.upa.pt/" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ws.broker.upa.pt/" version="1.0">
+
+  <xs:element name="InvalidPriceFault" type="tns:InvalidPriceFault"/>
+
+  <xs:element name="UnavailableTransportFault" type="tns:UnavailableTransportFault"/>
+
+  <xs:element name="UnavailableTransportPriceFault" type="tns:UnavailableTransportPriceFault"/>
+
+  <xs:element name="UnknownLocationFault" type="tns:UnknownLocationFault"/>
+
+  <xs:element name="UnknownTransportFault" type="tns:UnknownTransportFault"/>
+
+  <xs:element name="clearTransports" type="tns:clearTransports"/>
+
+  <xs:element name="clearTransportsResponse" type="tns:clearTransportsResponse"/>
+
+  <xs:element name="listTransports" type="tns:listTransports"/>
+
+  <xs:element name="listTransportsResponse" type="tns:listTransportsResponse"/>
+
+  <xs:element name="ping" type="tns:ping"/>
+
+  <xs:element name="pingResponse" type="tns:pingResponse"/>
+
+  <xs:element name="requestTransport" type="tns:requestTransport"/>
+
+  <xs:element name="requestTransportResponse" type="tns:requestTransportResponse"/>
+
+  <xs:element name="viewTransport" type="tns:viewTransport"/>
+
+  <xs:element name="viewTransportResponse" type="tns:viewTransportResponse"/>
+
+  <xs:complexType name="transportView">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:string"/>
+      <xs:element minOccurs="0" name="origin" type="xs:string"/>
+      <xs:element minOccurs="0" name="destination" type="xs:string"/>
+      <xs:element minOccurs="0" name="price" type="xs:int"/>
+      <xs:element minOccurs="0" name="transporterCompany" type="xs:string"/>
+      <xs:element minOccurs="0" name="state" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ping">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="listTransportsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:transportView"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UnavailableTransportFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="origin" type="xs:string"/>
+      <xs:element minOccurs="0" name="destination" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="listTransports">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="requestTransportResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="clearTransportsResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="requestTransport">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="origin" type="xs:string"/>
+      <xs:element minOccurs="0" name="destination" type="xs:string"/>
+      <xs:element name="price" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="clearTransports">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="InvalidPriceFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="price" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UnknownLocationFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="location" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="viewTransport">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="viewTransportResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:transportView"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UnavailableTransportPriceFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="bestPriceFound" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UnknownTransportFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pingResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="transportStateView">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REQUESTED"/>
+      <xs:enumeration value="BUDGETED"/>
+      <xs:enumeration value="FAILED"/>
+      <xs:enumeration value="BOOKED"/>
+      <xs:enumeration value="HEADING"/>
+      <xs:enumeration value="ONGOING"/>
+      <xs:enumeration value="COMPLETED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+<xs:schema xmlns:ns1="http://ws.broker.upa.pt/" xmlns:tns="http://ws.backup.broker.upa.pt/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" targetNamespace="http://ws.backup.broker.upa.pt/" version="1.0">
+
+  <xs:import namespace="http://ws.broker.upa.pt/"/>
+
+  <xs:element name="addTransport" type="tns:addTransport"/>
+
+  <xs:element name="addTransportResponse" type="tns:addTransportResponse"/>
+
+  <xs:element name="ping" type="tns:ping"/>
+
+  <xs:element name="updateMessageCounter" type="tns:updateMessageCounter"/>
+
+  <xs:element name="updateMessageCounterResponse" type="tns:updateMessageCounterResponse"/>
+
+  <xs:complexType name="addTransport">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="transport" type="ns1:transportView"/>
+      <xs:element minOccurs="0" name="transporterID" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="addTransportResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="ping">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="updateMessageCounter">
+    <xs:sequence>
+      <xs:element name="val" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateMessageCounterResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="addTransport">
+    <wsdl:part name="parameters" element="tns:addTransport">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ping">
+    <wsdl:part name="parameters" element="tns:ping">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateMessageCounter">
+    <wsdl:part name="parameters" element="tns:updateMessageCounter">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateMessageCounterResponse">
+    <wsdl:part name="parameters" element="tns:updateMessageCounterResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="addTransportResponse">
+    <wsdl:part name="parameters" element="tns:addTransportResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="BrokerBackup">
+    <wsdl:operation name="addTransport">
+      <wsdl:input name="addTransport" message="tns:addTransport">
+    </wsdl:input>
+      <wsdl:output name="addTransportResponse" message="tns:addTransportResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <wsdl:input name="ping" message="tns:ping">
+    </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="updateMessageCounter">
+      <wsdl:input name="updateMessageCounter" message="tns:updateMessageCounter">
+    </wsdl:input>
+      <wsdl:output name="updateMessageCounterResponse" message="tns:updateMessageCounterResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BrokerBackupServiceSoapBinding" type="tns:BrokerBackup">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="addTransport">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="addTransport">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="addTransportResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="updateMessageCounter">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="updateMessageCounter">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="updateMessageCounterResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BrokerBackupService">
+    <wsdl:port name="BrokerBackupPort" binding="tns:BrokerBackupServiceSoapBinding">
+      <soap:address location="http://localhost:9090/BrokerBackupPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
