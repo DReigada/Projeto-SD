@@ -24,6 +24,7 @@ import pt.upa.transporter.ws.cli.TransporterClient;
   targetNamespace="http://ws.broker.upa.pt/",
   serviceName="BrokerService"
 )
+
 public class BrokerPort implements BrokerPortType {
 
   private class BrokerTransportView {

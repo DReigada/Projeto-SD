@@ -1,5 +1,5 @@
 <!DOCTYPE doc [
-<!ENTITY handlerChain SYSTEM "TransporterService-handler.xml">
+<!ENTITY handlerChain SYSTEM "transporter-cli-handler.xml">
 ]>
 <jaxws:bindings
     xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"

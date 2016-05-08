@@ -20,9 +20,25 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
     public static final String CONTEXT_PROPERTY = "my.property";
+	
+    public static final String REQUEST_PROPERTY = "my.request.property";
+	public static final String CLASS_NAME = SignatureHandler.class.getSimpleName();
+	public static final String REQUEST_HEADER = "myRequestHeader";
+	public static final String REQUEST_NS = "urn:example";
+	public static final String TOKEN = "broker-handler";
+	
+	public static final String RESPONSE_PROPERTY = "my.response.property";
+	public static final String RESPONSE_HEADER = "myResponseHeader";
+	public static final String RESPONSE_NS = REQUEST_NS;
 
 
     public boolean handleMessage(SOAPMessageContext smc) {
+    	// *** #2 ***
+    	// get token from request context
+    	String propertyValue = (String) smc.get(REQUEST_PROPERTY);
+    	System.out.printf("%s received '%s'%n", CLASS_NAME, propertyValue);
+    	
+    	
         System.out.println("AddHeaderHandler: Handling message.");
 
         Boolean outboundElement = (Boolean) smc
@@ -43,13 +59,19 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
                     soapHeader = soapEnvelope.addHeader();
                 	}
                 {
-                	Name name = soapEnvelope.createName("NewHeader", "nw", "http://upa");
-                	SOAPElement element = soapHeader.addChildElement(name);
-                	element.addTextNode( "this is a new header" );      
+                	Name name = soapEnvelope.createName(REQUEST_HEADER, "e", REQUEST_NS);
+                	SOAPHeaderElement element = soapHeader.addHeaderElement(name); 
+                	// *** #3 ***
+    				// add header element value
+    				String newValue = propertyValue + "," + TOKEN;
+    				element.addTextNode(newValue);
+
+    				System.out.printf("%s put token '%s' on request message header%n", CLASS_NAME, newValue);
+                	
                 }
                 //System.out.println(element.getTextContent().toString());
-                //SOAPHeader sh2 = se.getHeader();
-                //System.out.println("sh2" + sh2.toString());
+                SOAPHeader sh2 = soapEnvelope.getHeader();
+                System.out.println("sh2" + sh2.toString());
                 
                 
                 
@@ -69,7 +91,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
                 }
 
                 // get first header element
-                Name name = se.createName("newHeader", "nw", "http://upa");
+                Name name = se.createName(RESPONSE_HEADER, "e", RESPONSE_NS);
                 Iterator it = sh.getChildElements(name);
                 // check header element
                 if (!it.hasNext()) {

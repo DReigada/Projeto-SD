@@ -8,7 +8,9 @@ import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
+import example.ws.handler.SignatureHandler;
 import pt.upa.transporter.core.Job;
 import pt.upa.transporter.core.Job.State;
 import pt.upa.transporter.core.Transporter;
@@ -19,13 +21,26 @@ import pt.upa.transporter.simulator.JobStateSimulator;
 @WebService(
 	    endpointInterface="pt.upa.transporter.ws.TransporterPortType"
 	)
-@HandlerChain(file = "/handler-chain.xml")
+@HandlerChain(file = "/transporter-handler-chain.xml")
 public class TransporterPort implements TransporterPortType{
 	
 	
+	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
+	public static final String TOKEN = "transporter";
+
 	@Resource
 	private WebServiceContext webServiceContext;
 	
+	public void hand(){
+		MessageContext messageContext = webServiceContext.getMessageContext();
+		String propertyValue = (String) messageContext.get(SignatureHandler.REQUEST_PROPERTY);
+		
+		String newValue = propertyValue + "," + TOKEN;
+		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, TOKEN);
+		messageContext.put(SignatureHandler.RESPONSE_PROPERTY, newValue);
+
+	}
+
 	
 	Transporter _transporter;
 	public JobStateSimulator _jobSimulator;
@@ -41,6 +56,7 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	@Override
 	public String ping(String name) {
+		hand();
 		return "Received message: " + name;
 	}
 	
@@ -62,6 +78,7 @@ public class TransporterPort implements TransporterPortType{
 			fault.setLocation(e.getLocation());
 			throw new BadLocationFault_Exception(e.getMessage(), fault);
 		}
+		
 	}
 	
 	/**
