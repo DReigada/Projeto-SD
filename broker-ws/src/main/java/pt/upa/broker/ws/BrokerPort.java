@@ -7,6 +7,8 @@ import java.util.List;
 import javax.jws.WebService;
 import javax.xml.registry.JAXRException;
 
+import pt.upa.broker.backup.ws.BrokerBackup;
+import pt.upa.broker.backup.ws.BrokerBackupPort;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
@@ -27,10 +29,12 @@ public class BrokerPort implements BrokerPortType {
 
   TransporterCompaniesManager _transportersManager;
   List<BrokerTransportView> _transports;
+  private BrokerBackup _backupPort;
 
   public BrokerPort() {
     _transportersManager = new TransporterCompaniesManager();
     _transports = new ArrayList<BrokerTransportView>();
+    _backupPort = null;
   }
 
   @Override
@@ -292,8 +296,13 @@ public class BrokerPort implements BrokerPortType {
 
   }
   
+  /** Backup Methods **/
   public void addTransport(BrokerTransportView transport){
 	  _transports.add(transport);
+  }
+  
+  public void setBackupPort(BrokerBackup port){
+	  _backupPort = port;
   }
   
 
