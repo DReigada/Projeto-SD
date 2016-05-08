@@ -6,26 +6,32 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 
 import javax.xml.registry.JAXRException;
 
-public class BrokerEndpointManager {
+public class BrokerEndpointManager implements EndpointManager{
 
   private String _uddiURL;
   private String _name;
   private String _url;
   private Endpoint _endpoint;
   private UDDINaming _uddiNaming;
+  private BrokerPort _port;
   
   public BrokerEndpointManager(String uddiURL) {
-    _uddiURL = uddiURL;
-    _endpoint = null;
-    _name = _url = null;
-    _uddiNaming = null;
+	  this(uddiURL, new BrokerPort());
+  }
+  
+  public BrokerEndpointManager(String uddiURL, BrokerPort brokerPort){
+	    _uddiURL = uddiURL;
+	    _endpoint = null;
+	    _name = _url = null;
+	    _uddiNaming = null;
+	    
+	    _port = brokerPort;
   }
 
   public void start(String url) {
     _url = url;
     
-    BrokerPort port = new BrokerPort();
-    _endpoint = Endpoint.create(port);
+    _endpoint = Endpoint.create(_port);
 
     // publish endpoint
     _endpoint.publish(_url);
