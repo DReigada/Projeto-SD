@@ -1,6 +1,6 @@
 package pt.upa.broker;
 
-import pt.upa.broker.ws.BrokerEndpointManager;
+import pt.upa.broker.ws.Broker;
 
 public class BrokerApplication {
 
@@ -18,18 +18,12 @@ public class BrokerApplication {
     String name = args[1];
     String url = args[2];
 
-    BrokerEndpointManager brokerEndPointManager = new BrokerEndpointManager(uddiURL);
+    Broker broker = new Broker(uddiURL, name, url, false);
 
     try {
 
-      // publish endpoint
-      System.out.printf("Starting %s%n", url);
-      brokerEndPointManager.start(url);
-
-      // publish to UDDI
-      System.out.printf("Publishing '%s' to UDDI at %s%n", name, uddiURL);
-      brokerEndPointManager.awaitConnections(name);
-
+      broker.start();
+      
       // wait
       System.out.println("Awaiting connections");
       System.out.println("Press enter to shutdown");
@@ -40,7 +34,7 @@ public class BrokerApplication {
       e.printStackTrace();
 
     } finally {
-      brokerEndPointManager.stop();
+      broker.stop();
     }
   }
 }
