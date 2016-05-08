@@ -41,6 +41,12 @@ public class BrokerBackupEndpointManager implements EndpointManager{
 	    _uddiNaming.rebind(_name, _url);
 	  }
 
+	  @Override
+	  public void connectToBackup(String backupName) throws JAXRException {
+		  // the backup server does not have backups
+		  return;  
+	  }
+
 	  public void stop() {
 	    try {
 	      if (_endpoint != null) {
@@ -70,4 +76,5 @@ public class BrokerBackupEndpointManager implements EndpointManager{
 	  public BrokerBackupPort getPort(){
 		  return _port;
 	  }
+
 	}

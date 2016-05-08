@@ -8,6 +8,8 @@ public interface EndpointManager {
 	  
 	  public void awaitConnections(String name) throws JAXRException;
 	  
+	  public void connectToBackup(String backupName) throws JAXRException;
+	  
 	  public void stop();
 	  
 }
