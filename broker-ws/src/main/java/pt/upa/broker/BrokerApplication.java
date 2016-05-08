@@ -8,21 +8,25 @@ public class BrokerApplication {
 		System.out.println(BrokerApplication.class.getSimpleName() + " starting...");
 
     // Check arguments
-    if (args.length < 3) {
+    if (args.length < 4) {
       System.err.println("Argument(s) missing!");
-      System.err.printf("Usage: java %s uddiURL wsName wsURL%n", BrokerApplication.class.getName());
+      System.err.printf("Usage: java %s uddiURL mainName wsURL y/n%n", BrokerApplication.class.getName());
       return;
     }
 
     String uddiURL = args[0];
     String name = args[1];
     String url = args[2];
-
-    Broker broker = new Broker(uddiURL, name, url, false);
+    String backup = args[3];
+    
+    boolean isBackup = backup.equals("y") ? true : false;
+  
+    
+    Broker broker = new Broker(uddiURL, name, url, isBackup);
 
     try {
 
-      broker.start();
+      broker.start(!isBackup);
       
       // wait
       System.out.println("Awaiting connections");
