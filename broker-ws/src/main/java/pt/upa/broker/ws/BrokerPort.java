@@ -243,6 +243,7 @@ public class BrokerPort implements BrokerPortType {
       // set transport to completed if company that made the transport is no longer in business
       if (company == null){
     	  transport.setTransportState(TransportStateView.COMPLETED);
+    	  _backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
     	  return transport.getTransportView();
       }
 
@@ -263,6 +264,8 @@ public class BrokerPort implements BrokerPortType {
         transport.setTransportState(state);
       }
     }
+    
+	_backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
     // returns the transport view to the client
     return transport.getTransportView();    
   }
