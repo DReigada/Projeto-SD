@@ -3,6 +3,8 @@ package pt.upa.broker.ws;
 import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.BindingProvider;
@@ -10,7 +12,9 @@ import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.broker.backup.ws.BrokerBackup;
+import pt.upa.broker.backup.ws.BrokerBackupPort;
 import pt.upa.broker.backup.ws.BrokerBackupService;
+import pt.upa.broker.backup.ws.ImAliveTask;
 
 public class BrokerEndpointManager implements EndpointManager{
 
@@ -68,6 +72,10 @@ public class BrokerEndpointManager implements EndpointManager{
     requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);
     
     _port.setBackupPort(backupPort);
+    
+    Timer imAliveTimer = new Timer(true);
+    ImAliveTask imAliveTask = new ImAliveTask(backupPort);
+    imAliveTimer.schedule(imAliveTask, 0, Broker.TIME_BETWEEN_PINGS);
   }
 
   public void stop() {
