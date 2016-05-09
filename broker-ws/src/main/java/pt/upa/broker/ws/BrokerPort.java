@@ -113,13 +113,17 @@ public class BrokerPort implements BrokerPortType {
       try {
         job = port.requestJob(origin, destination, price);
       } catch (BadLocationFault_Exception e) {
-        transport.setTransportState(TransportStateView.FAILED); 
+        transport.setTransportState(TransportStateView.FAILED);
+        _backupPort.addTransport(transport.getTransportView(), "");
+               
         UnknownLocationFault faultInfo = new UnknownLocationFault();
         faultInfo.setLocation(e.getFaultInfo().getLocation());
         throw new UnknownLocationFault_Exception("Unknown origin or destination.", faultInfo);
 
       } catch (BadPriceFault_Exception e) {
         transport.setTransportState(TransportStateView.FAILED); 
+        _backupPort.addTransport(transport.getTransportView(), "");
+        
         InvalidPriceFault faultInfo = new InvalidPriceFault();
         faultInfo.setPrice(price);
         throw new InvalidPriceFault_Exception("Invalid price.", faultInfo);
@@ -142,13 +146,16 @@ public class BrokerPort implements BrokerPortType {
 
     if (reason == 0) {
       transport.setTransportState(TransportStateView.FAILED);
+      _backupPort.addTransport(transport.getTransportView(), "");
+      
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
       throw new UnavailableTransportFault_Exception("No transport available for the requested route.", faultInfo);
     }
 
     transport.setTransportState(TransportStateView.BUDGETED);
-
+    _backupPort.addTransport(transport.getTransportView(), "");
+    
     for (int i=0; i<transporters.size(); ++i){
 
       TransporterClient port = transporters.get(i);
@@ -177,11 +184,14 @@ public class BrokerPort implements BrokerPortType {
 
     } else {
       transport.setTransportState(TransportStateView.FAILED);
+	  _backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
+	  
       UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
       faultInfo.setBestPriceFound(bestPrice);
       throw new UnavailableTransportPriceFault_Exception("No transport available for the requested price.", faultInfo); 
     }
-
+    
+	_backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
     return thisId+"";
   }
 
@@ -311,12 +321,11 @@ public class BrokerPort implements BrokerPortType {
 	    _transports.set(index, transport);
 	  }
 	}
-  
+
   public void setBackupPort(BrokerBackup port){
 	  _backupPort = port;
   }
   
-
   private TransportStateView convertToTransportStateView(JobStateView state) throws 
       UnknownTransportFault_Exception {
     TransportStateView validState;
