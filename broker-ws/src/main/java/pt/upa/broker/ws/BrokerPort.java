@@ -279,6 +279,7 @@ public class BrokerPort implements BrokerPortType {
     // get all the transporter companies
     try {
       Collection<TransporterClient> temp = _transportersManager.getAllTransporterPorts();
+      if(temp == null) temp = new ArrayList<TransporterClient>();
       companies = new ArrayList<TransporterClient>(temp);
     } catch (JAXRException e) {
       System.out.println("Error occurred connecting to juddi. Unable to clear " +
