@@ -65,7 +65,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// signing:
 				String bodyText = sb.getTextContent().toString();
-				byte[] bodyBytes = bodyText.getBytes();
+				//byte[] bodyBytes = bodyText.getBytes();
 
 				DigitalSignatureX509 sign = new DigitalSignatureX509();
 				String keyStorePath = "keys//" + propertyValue + ".jks";
@@ -74,7 +74,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				char[] kPass = KEY_PASSWORD.toCharArray();
 				PrivateKey privateKey = sign.getPrivateKeyFromKeystore(keyStorePath, keyStorePass, kAlias, kPass);
 
-				byte[] digitalSignature = sign.makeDigitalSignature(bodyBytes, privateKey);
+				String textToSign = propertyValue + bodyText;
+				byte[] bytesToSign = textToSign.getBytes();
+
+				byte[] digitalSignature = sign.makeDigitalSignature(bytesToSign, privateKey);
 
 
 				//System.out.println("Signature Bytes:");
@@ -136,7 +139,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// check body:
 				String bodyText = sb.getTextContent().toString();
-				byte[] bodyBytes = bodyText.getBytes();
+				//byte[] bodyBytes = bodyText.getBytes();
 				
 				// check  header 
 				if (sh == null) {
@@ -156,6 +159,11 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPElement senderElement = (SOAPElement) it.next();
 				System.out.println(senderElement.getTextContent());
 
+				//create string to compare
+				String textToVerify = senderElement.getTextContent() + bodyText;
+				byte[] bytesToVerify = textToVerify.getBytes();
+				
+				
 				// get signature header element
 				Name name = se.createName(RESPONSE_HEADER, "e", RESPONSE_NS);
 				@SuppressWarnings("rawtypes")
@@ -204,7 +212,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// verify the signature
 				System.out.println("Verifying ...");
 
-				boolean isValid = sign.verifyDigitalSignature(signatureBytes, bodyBytes, publicKey);
+				boolean isValid = sign.verifyDigitalSignature(signatureBytes, bytesToVerify, publicKey);
 
 				if (isValid) {
 					System.out.println("The digital signature is valid");
