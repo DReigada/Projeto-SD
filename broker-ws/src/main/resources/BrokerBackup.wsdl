@@ -44,9 +44,15 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="ping">
+  <xs:complexType name="UnknownTransportFault">
     <xs:sequence>
-      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="id" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pingResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -75,6 +81,12 @@
 
   <xs:complexType name="clearTransportsResponse">
     <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="ping">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="requestTransport">
@@ -119,18 +131,6 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="UnknownTransportFault">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="id" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="pingResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-
   <xs:simpleType name="transportStateView">
     <xs:restriction base="xs:string">
       <xs:enumeration value="REQUESTED"/>
@@ -148,9 +148,9 @@
 
   <xs:import namespace="http://ws.broker.upa.pt/"/>
 
-  <xs:element name="addTransport" type="tns:addTransport"/>
+  <xs:element name="clearTransports" type="tns:clearTransports"/>
 
-  <xs:element name="addTransportResponse" type="tns:addTransportResponse"/>
+  <xs:element name="clearTransportsResponse" type="tns:clearTransportsResponse"/>
 
   <xs:element name="ping" type="tns:ping"/>
 
@@ -158,14 +158,26 @@
 
   <xs:element name="updateMessageCounterResponse" type="tns:updateMessageCounterResponse"/>
 
-  <xs:complexType name="addTransport">
+  <xs:element name="updateTransport" type="tns:updateTransport"/>
+
+  <xs:element name="updateTransportResponse" type="tns:updateTransportResponse"/>
+
+  <xs:complexType name="updateTransport">
     <xs:sequence>
       <xs:element minOccurs="0" name="transport" type="ns1:transportView"/>
       <xs:element minOccurs="0" name="transporterID" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="addTransportResponse">
+  <xs:complexType name="updateTransportResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="clearTransports">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="clearTransportsResponse">
     <xs:sequence/>
   </xs:complexType>
 
@@ -185,8 +197,12 @@
 
 </xs:schema>
   </wsdl:types>
-  <wsdl:message name="addTransport">
-    <wsdl:part name="parameters" element="tns:addTransport">
+  <wsdl:message name="clearTransportsResponse">
+    <wsdl:part name="parameters" element="tns:clearTransportsResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="clearTransports">
+    <wsdl:part name="parameters" element="tns:clearTransports">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="ping">
@@ -197,19 +213,29 @@
     <wsdl:part name="parameters" element="tns:updateMessageCounter">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="updateTransportResponse">
+    <wsdl:part name="parameters" element="tns:updateTransportResponse">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="updateMessageCounterResponse">
     <wsdl:part name="parameters" element="tns:updateMessageCounterResponse">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="addTransportResponse">
-    <wsdl:part name="parameters" element="tns:addTransportResponse">
+  <wsdl:message name="updateTransport">
+    <wsdl:part name="parameters" element="tns:updateTransport">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="BrokerBackup">
-    <wsdl:operation name="addTransport">
-      <wsdl:input name="addTransport" message="tns:addTransport">
+    <wsdl:operation name="updateTransport">
+      <wsdl:input name="updateTransport" message="tns:updateTransport">
     </wsdl:input>
-      <wsdl:output name="addTransportResponse" message="tns:addTransportResponse">
+      <wsdl:output name="updateTransportResponse" message="tns:updateTransportResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearTransports">
+      <wsdl:input name="clearTransports" message="tns:clearTransports">
+    </wsdl:input>
+      <wsdl:output name="clearTransportsResponse" message="tns:clearTransportsResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="ping">
@@ -225,12 +251,21 @@
   </wsdl:portType>
   <wsdl:binding name="BrokerBackupServiceSoapBinding" type="tns:BrokerBackup">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="addTransport">
+    <wsdl:operation name="updateTransport">
       <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="addTransport">
+      <wsdl:input name="updateTransport">
         <soap:body use="literal"/>
       </wsdl:input>
-      <wsdl:output name="addTransportResponse">
+      <wsdl:output name="updateTransportResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearTransports">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="clearTransports">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="clearTransportsResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>

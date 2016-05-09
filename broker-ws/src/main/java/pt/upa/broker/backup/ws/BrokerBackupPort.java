@@ -10,7 +10,7 @@ import pt.upa.broker.ws.BrokerTransportView;
 import pt.upa.broker.ws.TransportView;
 
 @WebService(endpointInterface = "pt.upa.broker.backup.ws.BrokerBackup")
-public class BrokerBackupPort implements BrokerBackupBase{
+public class BrokerBackupPort implements BrokerBackup{
 	
 	
 	private BrokerPort _port;
@@ -26,11 +26,15 @@ public class BrokerBackupPort implements BrokerBackupBase{
 	}
 	
 	@Override
-	public void addTransport(TransportView transport, String transporterID) {
+	public void updateTransport(TransportView transport, String transporterID) {
 		BrokerTransportView view = new BrokerTransportView(transport, transporterID);
 		_port.updateTransport(view);
 	}
 
+	@Override
+	public void clearTransports() {
+		_port.clearBackup();
+	}
 
 	@Override
 	public void updateMessageCounter(int val) {
@@ -62,6 +66,7 @@ public class BrokerBackupPort implements BrokerBackupBase{
 	public BrokerPort getBrokerPort() {
 		return _port;
 	}
+
 	
 	
 }
