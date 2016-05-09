@@ -2,6 +2,8 @@ package pt.upa.broker.backup.ws;
 
 import java.util.TimerTask;
 
+import pt.upa.broker.ws.Broker;
+
 public class BrokerFailureDetector extends TimerTask{
 	
 	private long _timeSinceLastPing;
@@ -14,7 +16,7 @@ public class BrokerFailureDetector extends TimerTask{
 	
 	@Override
 	public void run() {
-		if (System.currentTimeMillis() - BrokerBackupPort.TIME_CHECK_BETWEEN_PINGS > _timeSinceLastPing) {
+		if (System.currentTimeMillis() - Broker.TIME_CHECK_BETWEEN_PINGS > _timeSinceLastPing) {
 			_port.makePrimary();
 		}
 	}

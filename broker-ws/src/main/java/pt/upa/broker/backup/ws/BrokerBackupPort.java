@@ -12,8 +12,6 @@ import pt.upa.broker.ws.TransportView;
 @WebService(endpointInterface = "pt.upa.broker.backup.ws.BrokerBackup")
 public class BrokerBackupPort implements BrokerBackupBase{
 	
-	public static final long TIME_CHECK_BETWEEN_PINGS = 2000L;
-	
 	
 	private BrokerPort _port;
 	private boolean _firstPing;
@@ -48,7 +46,7 @@ public class BrokerBackupPort implements BrokerBackupBase{
 			_failureDetector = new BrokerFailureDetector(this, System.currentTimeMillis());
 			_failureTimer = new Timer(true);	// create a daemon timer
 			
-			_failureTimer.schedule(_failureDetector, 0, TIME_CHECK_BETWEEN_PINGS);		
+			_failureTimer.schedule(_failureDetector, 0, Broker.TIME_CHECK_BETWEEN_PINGS);		
 		}
 		else{
 			_failureDetector.updateTime(System.currentTimeMillis());

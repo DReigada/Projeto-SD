@@ -14,6 +14,8 @@ public class Broker {
     private EndpointManager _endpoint;
     
     public static final String BACKUP_NAME_SUFIX = "Backup";
+	public static final long TIME_CHECK_BETWEEN_PINGS = 2000L;
+	public static final long TIME_BETWEEN_PINGS = 1500L; 
     
 	public Broker(String uddiURL, String name, String url, boolean isBackup) {
 		_uddiURL = uddiURL;
