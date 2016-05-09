@@ -196,9 +196,13 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				String certificateFile = "keys//" + senderElement.getTextContent() + ".cer";
 				
 				X509CertificateCheck caCheck = new X509CertificateCheck();
+				// get the sender's public certificate file
 				Certificate certificate = sign.readCertificateFile(certificateFile);
+				// get the CA's certificate and public key
 				Certificate caCertificate = caCheck.readCertificateFile(CA_CERT);
 				PublicKey caPublicKey = caCertificate.getPublicKey();
+				
+				// check if the certificate is valid (signed by CA)
 				if (caCheck.verifySignedCertificate(certificate,caPublicKey)) {
 					System.out.println("The signed certificate is valid");
 				} else {
