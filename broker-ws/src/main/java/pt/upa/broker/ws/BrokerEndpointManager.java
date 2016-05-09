@@ -4,7 +4,6 @@ import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.BindingProvider;
@@ -12,7 +11,6 @@ import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.broker.backup.ws.BrokerBackup;
-import pt.upa.broker.backup.ws.BrokerBackupPort;
 import pt.upa.broker.backup.ws.BrokerBackupService;
 import pt.upa.broker.backup.ws.ImAliveTask;
 

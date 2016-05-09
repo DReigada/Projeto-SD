@@ -8,7 +8,6 @@ import javax.jws.WebService;
 import javax.xml.registry.JAXRException;
 
 import pt.upa.broker.backup.ws.BrokerBackup;
-import pt.upa.broker.backup.ws.BrokerBackupPort;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
