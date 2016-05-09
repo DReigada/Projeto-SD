@@ -114,7 +114,7 @@ public class BrokerPort implements BrokerPortType {
         job = port.requestJob(origin, destination, price);
       } catch (BadLocationFault_Exception e) {
         transport.setTransportState(TransportStateView.FAILED);
-        _backupPort.addTransport(transport.getTransportView(), "");
+        sendUpdatedTransport(transport);
                
         UnknownLocationFault faultInfo = new UnknownLocationFault();
         faultInfo.setLocation(e.getFaultInfo().getLocation());
@@ -122,7 +122,7 @@ public class BrokerPort implements BrokerPortType {
 
       } catch (BadPriceFault_Exception e) {
         transport.setTransportState(TransportStateView.FAILED); 
-        _backupPort.addTransport(transport.getTransportView(), "");
+        sendUpdatedTransport(transport);
         
         InvalidPriceFault faultInfo = new InvalidPriceFault();
         faultInfo.setPrice(price);
@@ -146,7 +146,7 @@ public class BrokerPort implements BrokerPortType {
 
     if (reason == 0) {
       transport.setTransportState(TransportStateView.FAILED);
-      _backupPort.addTransport(transport.getTransportView(), "");
+      sendUpdatedTransport(transport);
       
       UnavailableTransportFault faultInfo = new UnavailableTransportFault();
       faultInfo.setOrigin(origin); faultInfo.setDestination(destination);
@@ -154,7 +154,7 @@ public class BrokerPort implements BrokerPortType {
     }
 
     transport.setTransportState(TransportStateView.BUDGETED);
-    _backupPort.addTransport(transport.getTransportView(), "");
+    sendUpdatedTransport(transport);
     
     for (int i=0; i<transporters.size(); ++i){
 
@@ -184,14 +184,14 @@ public class BrokerPort implements BrokerPortType {
 
     } else {
       transport.setTransportState(TransportStateView.FAILED);
-	  _backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
+      sendUpdatedTransport(transport);
 	  
       UnavailableTransportPriceFault faultInfo = new UnavailableTransportPriceFault();
       faultInfo.setBestPriceFound(bestPrice);
       throw new UnavailableTransportPriceFault_Exception("No transport available for the requested price.", faultInfo); 
     }
     
-	_backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
+    sendUpdatedTransport(transport);
     return thisId+"";
   }
 
@@ -243,7 +243,7 @@ public class BrokerPort implements BrokerPortType {
       // set transport to completed if company that made the transport is no longer in business
       if (company == null){
     	  transport.setTransportState(TransportStateView.COMPLETED);
-    	  _backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
+    	  sendUpdatedTransport(transport);
     	  return transport.getTransportView();
       }
 
@@ -265,7 +265,7 @@ public class BrokerPort implements BrokerPortType {
       }
     }
     
-	_backupPort.addTransport(transport.getTransportView(), transport.getTransporterId());
+    sendUpdatedTransport(transport);
     // returns the transport view to the client
     return transport.getTransportView();    
   }
@@ -306,12 +306,16 @@ public class BrokerPort implements BrokerPortType {
     _transportersManager = new TransporterCompaniesManager();
     // clear the transports list
     _transports = new ArrayList<BrokerTransportView>();
-
+    
+    //clear the backup list
+    _backupPort.clearTransports();
   }
   
   /** Backup Methods **/
-  public void addTransport(BrokerTransportView transport){
-	  _transports.add(transport);
+  public void sendUpdatedTransport(BrokerTransportView transport){
+	  if(_backupPort == null) return;
+	  
+	  _backupPort.updateTransport(transport.getTransportView(), transport.getTransporterId());
   }
   
   public void updateTransport(BrokerTransportView transport){
@@ -324,6 +328,10 @@ public class BrokerPort implements BrokerPortType {
 	    _transports.set(index, transport);
 	  }
 	}
+  
+  public void clearBackup(){
+    _transports = new ArrayList<BrokerTransportView>();
+  }
 
   public void setBackupPort(BrokerBackup port){
 	  _backupPort = port;
