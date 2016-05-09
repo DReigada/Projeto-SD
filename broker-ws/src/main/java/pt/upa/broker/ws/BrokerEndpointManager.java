@@ -22,6 +22,7 @@ public class BrokerEndpointManager implements EndpointManager{
   private Endpoint _endpoint;
   private UDDINaming _uddiNaming;
   private BrokerPort _port;
+  private Timer _imAliveTimer;
   
   public BrokerEndpointManager(String uddiURL) {
 	  this(uddiURL, new BrokerPort());
@@ -71,12 +72,15 @@ public class BrokerEndpointManager implements EndpointManager{
     
     _port.setBackupPort(backupPort);
     
-    Timer imAliveTimer = new Timer(true);
+    _imAliveTimer = new Timer(true);
     ImAliveTask imAliveTask = new ImAliveTask(backupPort);
-    imAliveTimer.schedule(imAliveTask, 0, Broker.TIME_BETWEEN_PINGS);
+    _imAliveTimer.schedule(imAliveTask, 0, Broker.TIME_BETWEEN_PINGS);
   }
 
   public void stop() {
+	  // stop the connection to the backup server
+	_imAliveTimer.cancel();
+	
     try {
       if (_endpoint != null) {
         // stop endpoint
