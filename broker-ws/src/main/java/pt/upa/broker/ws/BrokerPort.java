@@ -301,6 +301,17 @@ public class BrokerPort implements BrokerPortType {
 	  _transports.add(transport);
   }
   
+  public void updateTransport(BrokerTransportView transport){
+	  int index = Integer.parseInt(transport.getTransportView().getId()) - 1;
+	  
+	  if(index == _transports.size()){
+	    _transports.add(transport);
+	  }
+	  else{
+	    _transports.set(index, transport);
+	  }
+	}
+  
   public void setBackupPort(BrokerBackup port){
 	  _backupPort = port;
   }

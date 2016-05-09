@@ -28,7 +28,7 @@ public class BrokerBackupPort implements BrokerBackupBase{
 	@Override
 	public void addTransport(TransportView transport, String transporterID) {
 		BrokerTransportView view = new BrokerTransportView(transport, transporterID);
-		_port.addTransport(view);
+		_port.updateTransport(view);
 	}
 
 
