@@ -26,21 +26,23 @@ public class TransporterPort implements TransporterPortType{
 	
 	
 	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
-	public static final String TOKEN = "transporter";
+	public static String TOKEN = "transporter";
 
 	@Resource
 	private WebServiceContext webServiceContext;
 	
-	public void hand(){
+	public void handle() {
 		MessageContext messageContext = webServiceContext.getMessageContext();
-		String propertyValue = (String) messageContext.get(SignatureHandler.REQUEST_PROPERTY);
+		//RESPONSE_PROPERTY = UpaBroker
+		//messageContext.put(SignatureHandlerServer.RESPONSE_PROPERTY, "UpaBroker");
 		
-		String newValue = propertyValue + "," + TOKEN;
-		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, TOKEN);
-		messageContext.put(SignatureHandler.RESPONSE_PROPERTY, newValue);
-
+		TOKEN = _transporter.getName();
+		String newValue = TOKEN;
+		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, newValue);
+		//REQUEST_PROPERTY = UpaTransporterX
+		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
+		
 	}
-
 	
 	Transporter _transporter;
 	public JobStateSimulator _jobSimulator;
@@ -56,7 +58,7 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	@Override
 	public String ping(String name) {
-		hand();
+		handle();
 		return "Received message: " + name;
 	}
 	
