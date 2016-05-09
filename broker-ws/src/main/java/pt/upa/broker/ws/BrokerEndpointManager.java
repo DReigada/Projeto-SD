@@ -78,8 +78,9 @@ public class BrokerEndpointManager implements EndpointManager{
   }
 
   public void stop() {
-	  // stop the connection to the backup server
-	_imAliveTimer.cancel();
+	// stop the connection to the backup server
+	if(_imAliveTimer != null)
+		_imAliveTimer.cancel();
 	
     try {
       if (_endpoint != null) {
