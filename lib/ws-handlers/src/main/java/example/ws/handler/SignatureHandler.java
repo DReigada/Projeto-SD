@@ -27,6 +27,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	final static String KEYSTORE_PASSWORD = "ins3cur3";
 	final static String KEY_PASSWORD = "1nsecure";
+	final static String CA_CERT = "keys//ca-certificate.pem.txt";
 	
 	public static final String REQUEST_PROPERTY = "my.request.property";
 	//public static final String RESPONSE_PROPERTY = "my.response.property";
@@ -67,7 +68,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				byte[] bodyBytes = bodyText.getBytes();
 
 				DigitalSignatureX509 sign = new DigitalSignatureX509();
-				String keyStorePath = propertyValue + ".jks";
+				String keyStorePath = "keys//" + propertyValue + ".jks";
 				char[] keyStorePass = KEYSTORE_PASSWORD.toCharArray();
 				String kAlias = propertyValue;
 				char[] kPass = KEY_PASSWORD.toCharArray();
@@ -113,7 +114,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				System.out.printf("Failed to add SOAP header because of %s%n", e);
 			} catch (Exception e) {
 				System.out.printf("Failed to add Signature header because of %s%n", e);
-				// TODO Auto-generated catch block
+				// Do something else
 			}
 
 		} else {
@@ -146,6 +147,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				
 				// get sender header element
 				Name sender = se.createName("Sender", "e", REQUEST_NS);
+				@SuppressWarnings("rawtypes")
 				Iterator it = sh.getChildElements(sender);
 				// check header element
 				if (!it.hasNext()) {
@@ -154,11 +156,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPElement senderElement = (SOAPElement) it.next();
 				System.out.println(senderElement.getTextContent());
 
-				
-
-
 				// get signature header element
 				Name name = se.createName(RESPONSE_HEADER, "e", RESPONSE_NS);
+				@SuppressWarnings("rawtypes")
 				Iterator it2 = sh.getChildElements(name);
 				// check header element
 				if (!it2.hasNext()) {
@@ -185,8 +185,20 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				//System.out.print("Ciphered bytes: ");
 				//System.out.println(printHexBinary(signatureBytes));
 
-				String certificateFile = senderElement.getTextContent() + ".cer";
+				String certificateFile = "keys//" + senderElement.getTextContent() + ".cer";
+				
+				X509CertificateCheck caCheck = new X509CertificateCheck();
 				Certificate certificate = sign.readCertificateFile(certificateFile);
+				Certificate caCertificate = caCheck.readCertificateFile(CA_CERT);
+				PublicKey caPublicKey = caCertificate.getPublicKey();
+				if (caCheck.verifySignedCertificate(certificate,caPublicKey)) {
+					System.out.println("The signed certificate is valid");
+				} else {
+					System.err.println("The signed certificate is not valid");
+					//Do something else // exception
+				}				
+			
+				
 				PublicKey publicKey = certificate.getPublicKey();
 
 				// verify the signature

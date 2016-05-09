@@ -54,26 +54,31 @@ public class TransporterClient implements TransporterPortType{
 	@Override
 	public JobView requestJob(String origin, String destination, int price)
 			throws BadLocationFault_Exception, BadPriceFault_Exception {
+		handle();
 		return _port.requestJob(origin, destination, price);
 	}
 
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
+		handle();
 		return _port.decideJob(id, accept);
 	}
 
 	@Override
 	public JobView jobStatus(String id) {
+		handle();
 		return _port.jobStatus(id);
 	}
 
 	@Override
 	public List<JobView> listJobs() {
+		handle();
 		return _port.listJobs();
 	}
 
 	@Override
 	public void clearJobs() {
+		handle();
 		_port.clearJobs();
 	}
 
