@@ -20,6 +20,7 @@ import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
@@ -161,6 +162,17 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				}
 				
 				
+				// get msgcounter header element
+				Name counter = se.createName("MsgCounter", "e", REQUEST_NS);
+				@SuppressWarnings("rawtypes")
+				Iterator it3 = sh.getChildElements(counter);
+				// check header element
+				if (!it3.hasNext()) {
+					return true;
+				}
+				SOAPElement counterElement = (SOAPElement) it3.next();
+				System.out.println(counterElement.getTextContent());
+				
 				// get sender header element
 				Name sender = se.createName("Sender", "e", REQUEST_NS);
 				@SuppressWarnings("rawtypes")
@@ -237,6 +249,14 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				} else {
 					System.out.println("The digital signature is NOT valid");
 				}
+				
+				
+				//put messageCounter on context
+				String msgCounter = counterElement.getTextContent();
+				smc.put(COUNTER_PROPERTY, msgCounter);
+				// set property scope to application so that server class can
+				// access property
+				smc.setScope(COUNTER_PROPERTY, Scope.APPLICATION);
 
 
 			} catch (SOAPException e) {

@@ -41,8 +41,10 @@ public class TransporterPort implements TransporterPortType{
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, newValue);
 		//REQUEST_PROPERTY = UpaTransporterX
 		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
-		messageContext.put(SignatureHandler.COUNTER_PROPERTY, "99");
-
+		int inboundMsgCounter = Integer.parseInt((String) messageContext.get(SignatureHandler.COUNTER_PROPERTY));
+		System.out.println("Inbound message counter received: " + inboundMsgCounter);
+		
+		//ver se tenho que fazer o put com o contador novamente...
 	}
 
 	Transporter _transporter;
