@@ -39,6 +39,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	public static final String RESPONSE_NS = REQUEST_NS;
 
 	public static final String CLASS_NAME = SignatureHandlerClient.class.getSimpleName();
+	public static final String COUNTER_PROPERTY = "my.message.counter";
 
 	public boolean handleMessage(SOAPMessageContext smc) {
 		Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -54,6 +55,14 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 			//String propertyValue2 = (String) smc.get(RESPONSE_PROPERTY);
 			//System.out.printf("%s received '%s'%n", CLASS_NAME, propertyValue2);
 
+			String msgCounter = (String) smc.get(COUNTER_PROPERTY);
+			
+			System.out.println();
+			System.out.println("-------------------");
+			System.out.println("--message counter--");
+			System.out.println(msgCounter);
+			System.out.println("-------------------");
+			System.out.println();
 
 			// put token in request SOAP header
 			try {
@@ -96,6 +105,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 					sh = se.addHeader();
 
 				// add header element (name, namespace prefix, namespace)
+				Name counter = se.createName("MsgCounter", "e", REQUEST_NS);
+				SOAPHeaderElement counterElement = sh.addHeaderElement(counter);
+				
 				Name sender = se.createName("Sender", "e", REQUEST_NS);
 				SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
 				
@@ -106,6 +118,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// add header element value
 				//String newValue = propertyValue + "," + TOKEN;
 				//element.addTextNode(newValue);
+				counterElement.addTextNode(msgCounter);
 				senderElement.addTextNode(propertyValue);
 				element.addTextNode(signatureText);
 				

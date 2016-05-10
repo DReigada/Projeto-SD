@@ -21,7 +21,7 @@ public class TransporterClient implements TransporterPortType{
 	public static final String TOKEN = "UpaBroker";
 	
 	TransporterPortType _port;
-	
+	int counter = 0;
 	BindingProvider bindingProvider;
 	Map<String, Object> requestContext;
 	
@@ -33,15 +33,21 @@ public class TransporterClient implements TransporterPortType{
         bindingProvider = (BindingProvider) _port;
         requestContext = bindingProvider.getRequestContext();
         requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);	
+        
+
 
 	}
 	
 	public void handle() {
         //1
+		counter = counter+1;
         // put token UpaBroker in request context
 		String initialValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);
 		requestContext.put(SignatureHandler.REQUEST_PROPERTY, initialValue);
+        
+        String msgCounter = Integer.toString(counter);
+        requestContext.put(SignatureHandler.COUNTER_PROPERTY, msgCounter);
 	}
 	
 	@Override
