@@ -28,9 +28,7 @@ public class TransporterPort implements TransporterPortType{
 	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
 	public static String TOKEN = "transporter";
 	public static String destinationEndpoint = "http://localhost:8080/broker-ws/endpoint";
-	
-	int lastMsgReceived = 0;
-	
+		
 	@Resource
 	private WebServiceContext webServiceContext;
 
@@ -54,6 +52,8 @@ public class TransporterPort implements TransporterPortType{
 	public TransporterPort(Transporter transporter) {
 		_transporter = transporter;
 		_jobSimulator = new JobStateSimulator();
+		SignatureHandler.selfT = "http://localhost:8081/transporter-ws/endpoint";
+
 	}
 
 	/**
@@ -143,6 +143,7 @@ public class TransporterPort implements TransporterPortType{
 	 * Stops the job simulator
 	 */
 	void stopSimulator(){
+		//handle();
 		_jobSimulator.stop();
 	}
 }

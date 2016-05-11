@@ -41,6 +41,7 @@ public class TransporterClient implements TransporterPortType{
 	
 	public void handle() {
         		
+		SignatureHandler.selfB = "http://localhost:8080/broker-ws/endpoint";
         // put token UpaBroker in request context
 		String initialValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);

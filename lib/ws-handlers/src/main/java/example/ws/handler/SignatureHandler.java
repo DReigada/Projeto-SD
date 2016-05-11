@@ -27,31 +27,33 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static int counter = 0;
 	public static String destination = null;
-	
+	public static String selfB;
+	public static String selfT;
+
 	final static String KEYSTORE_PASSWORD = "ins3cur3";
 	final static String KEY_PASSWORD = "1nsecure";
 	final static String CA_CERT = "keys//ca-certificate.pem.txt";
-	
+
 	public static final String REQUEST_PROPERTY = "my.request.property";
 
-	public static final String REQUEST_HEADER = "Signature";
+	public static final String SIGN_HEADER = "Signature";
 	public static final String REQUEST_NS = "urn:UPA";
 
-	public static final String RESPONSE_HEADER = REQUEST_HEADER;
-	public static final String RESPONSE_NS = REQUEST_NS;
+	public static final String MSGCOUNTER_HEADER = "MsgCounter";
+	public static final String SENDER_HEADER = "Sender";
+	public static final String DESTINATION_HEADER = "Destination";
+	public static final String PREFIX = "e";
+
 
 	public static final String CLASS_NAME = SignatureHandlerClient.class.getSimpleName();
-	
+
 	public boolean handleMessage(SOAPMessageContext smc) {
 		Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 		if (outbound) {
-			// outbound message
-
 			// get token from request context - sender
 			String origin = (String) smc.get(REQUEST_PROPERTY);
 			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
 
-			// put token in request SOAP header
 			try {
 				// get SOAP envelope
 				SOAPMessage msg = smc.getMessage();
@@ -61,25 +63,11 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// get body text to sign:
 				String bodyText = sb.getTextContent().toString();
-				
-				// get signature stuff
-				DigitalSignatureX509 sign = new DigitalSignatureX509();
-				String keyStorePath = "keys//" + origin + ".jks";
-				char[] keyStorePass = KEYSTORE_PASSWORD.toCharArray();
-				String kAlias = origin;
-				char[] kPass = KEY_PASSWORD.toCharArray();
-				PrivateKey privateKey = sign.getPrivateKeyFromKeystore(keyStorePath, keyStorePass, kAlias, kPass);
-
 				String textToSign = String.valueOf(SignatureHandler.counter) +
-									SignatureHandler.destination + origin + bodyText;
-				byte[] bytesToSign = textToSign.getBytes();
+						SignatureHandler.destination + origin + bodyText;
 
-				byte[] digitalSignature = sign.makeDigitalSignature(bytesToSign, privateKey);
-
-				// encoding binary data with base 64
-				String signatureText = printBase64Binary(digitalSignature);
-
-
+				// Sign!
+				String signatureText = sign(origin, textToSign);
 
 				// add header
 				SOAPHeader sh = se.getHeader();
@@ -87,16 +75,16 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 					sh = se.addHeader();
 
 				// add header elements (name, namespace prefix, namespace)
-				Name msgCounter = se.createName("MsgCounter", "e", REQUEST_NS);
+				Name msgCounter = se.createName(MSGCOUNTER_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement counterElement = sh.addHeaderElement(msgCounter);
-				
-				Name destination = se.createName("Destination", "e", REQUEST_NS);
+
+				Name destination = se.createName(DESTINATION_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement destinationElement = sh.addHeaderElement(destination);
-				
-				Name sender = se.createName("Sender", "e", REQUEST_NS);
+
+				Name sender = se.createName(SENDER_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
-				
-				Name name = se.createName(REQUEST_HEADER, "e", REQUEST_NS);
+
+				Name name = se.createName(SIGN_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 
@@ -111,7 +99,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				System.out.printf("Failed to add SOAP header because of %s%n", e);
 			} catch (Exception e) {
 				System.out.printf("Failed to add Signature header because of %s%n", e);
-				// Do something else
 			}
 
 		} else {
@@ -127,116 +114,145 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// check body:
 				String bodyText = sb.getTextContent().toString();
-				
+
 				// check  header 
 				if (sh == null) {
 					System.out.println("Header not found.");
 					return true;
 				}
-				
-				// get msgcounter header element
-				Name destination = se.createName("Destination", "e", REQUEST_NS);
-				@SuppressWarnings("rawtypes")
-				Iterator it4 = sh.getChildElements(destination);
-				// check header element
-				if (!it4.hasNext()) {
-					return true;
-				}
-				SOAPElement destinationElement = (SOAPElement) it4.next();
-				System.out.println(destinationElement.getTextContent());
-				
-				// get msgcounter header element
-				Name counter = se.createName("MsgCounter", "e", REQUEST_NS);
-				@SuppressWarnings("rawtypes")
-				Iterator it3 = sh.getChildElements(counter);
-				// check header element
-				if (!it3.hasNext()) {
-					return true;
-				}
-				SOAPElement counterElement = (SOAPElement) it3.next();
-				SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
-				System.out.println(counterElement.getTextContent());
-				
-				// get sender header element
-				Name sender = se.createName("Sender", "e", REQUEST_NS);
-				@SuppressWarnings("rawtypes")
-				Iterator it = sh.getChildElements(sender);
-				// check header element
-				if (!it.hasNext()) {
-					return true;
-				}
-				SOAPElement senderElement = (SOAPElement) it.next();
-				System.out.println(senderElement.getTextContent());
 
+				SOAPElement destinationElement = getHeaderFromSOAP
+						(DESTINATION_HEADER, PREFIX, REQUEST_NS, se, sh);
+				SOAPElement counterElement = getHeaderFromSOAP
+						(MSGCOUNTER_HEADER, PREFIX, REQUEST_NS, se, sh);	
+				SOAPElement senderElement = getHeaderFromSOAP
+						(SENDER_HEADER, PREFIX, REQUEST_NS, se, sh);
+				SOAPElement signatureElement = getHeaderFromSOAP
+						(SIGN_HEADER, PREFIX, REQUEST_NS, se, sh);
+
+				SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
+
+				/*
+				// check counter validity
+				if (verifyIDCounter(destinationElement.getTextContent(), Integer.parseInt(counterElement.getTextContent()))) {
+					SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
+				} else {
+					System.out.println("Message not valid.");
+				}
+				*/
+				// get header element value
+				String headerValue = signatureElement.getValue();
 				//create string to compare
 				String textToVerify = String.valueOf(SignatureHandler.counter) + 
 						destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
-				byte[] bytesToVerify = textToVerify.getBytes();
-				
-				
-				// get signature header element
-				Name name = se.createName(RESPONSE_HEADER, "e", RESPONSE_NS);
-				@SuppressWarnings("rawtypes")
-				Iterator it2 = sh.getChildElements(name);
-				// check header element
-				if (!it2.hasNext()) {
-					System.out.printf("Header element %s not found.%n", RESPONSE_HEADER);
-					return true;
-				}
-				SOAPElement element = (SOAPElement) it2.next();
-
-				// get header element value
-				String headerValue = element.getValue();
-				//System.out.printf("%s got '%s'%n", CLASS_NAME, headerValue);
-				
-
 				// verify signature
-				DigitalSignatureX509 sign = new DigitalSignatureX509();
+				verify(senderElement.getTextContent(), headerValue, textToVerify);
 
-				// decoding string in base 64
-				byte[] signatureBytes = parseBase64Binary(headerValue);
-
-				String certificateFile = "keys//" + senderElement.getTextContent() + ".cer";
-				
-				X509CertificateCheck caCheck = new X509CertificateCheck();
-				// get the sender's public certificate file
-				Certificate certificate = sign.readCertificateFile(certificateFile);
-				// get the CA's certificate and public key
-				Certificate caCertificate = caCheck.readCertificateFile(CA_CERT);
-				PublicKey caPublicKey = caCertificate.getPublicKey();
-				
-				// check if the certificate is valid (signed by CA)
-				if (caCheck.verifySignedCertificate(certificate,caPublicKey)) {
-					System.out.println("The signed certificate is valid");
-				} else {
-					System.err.println("The signed certificate is not valid");
-					//Do something else // exception
-				}				
-			
-				
-				PublicKey publicKey = certificate.getPublicKey();
-
-				// verify the signature
-				System.out.println("Verifying ...");
-
-				boolean isValid = sign.verifyDigitalSignature(signatureBytes, bytesToVerify, publicKey);
-
-				if (isValid) {
-					System.out.println("The digital signature is valid");
-
-				} else {
-					System.out.println("The digital signature is NOT valid");
-				}
 
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
 			} catch (Exception e) {
 				System.out.printf("Exception caught", e);
+
 			}
 
 		}
-
 		return true;
+	}
+
+	private boolean verifyIDCounter(String destin, int counterChk) {
+		if (destin == selfB){
+			if (counterChk == SignatureHandler.counter){
+				return true;
+			} else
+				return false;
+		} else if (destin == selfT){
+			if (SignatureHandler.counter == 0 && counterChk > 0){
+				return true;
+			}
+			else if (counterChk > SignatureHandler.counter) {
+				return true;
+			}	
+		}
+
+		return false;
+
+	}
+
+	public SOAPElement getHeaderFromSOAP
+	(String name, String prefix, String namespace, SOAPEnvelope soapE, SOAPHeader soapH) throws SOAPException {
+		SOAPEnvelope _se = soapE;
+		SOAPHeader _sh = soapH;
+		Name destination = _se.createName(name, prefix, namespace);
+		@SuppressWarnings("rawtypes")
+		Iterator it = _sh.getChildElements(destination);
+		// check header element
+		if (!it.hasNext()) {
+			return null;
+		}
+		SOAPElement element = (SOAPElement) it.next();
+		return element;
+	}
+
+	public String sign (String orig, String text2Sign) throws Exception{
+		String _origin = orig;
+		String _text2Sign = text2Sign;
+		// get signature stuff
+		DigitalSignatureX509 Sign = new DigitalSignatureX509();
+		String keyStorePath = "keys//" + _origin + ".jks";
+		char[] keyStorePass = KEYSTORE_PASSWORD.toCharArray();
+		String kAlias = _origin;
+		char[] kPass = KEY_PASSWORD.toCharArray();
+		PrivateKey privateKey = Sign.getPrivateKeyFromKeystore(keyStorePath, keyStorePass, kAlias, kPass);
+
+		// sign with counter, destination, sender and bodytext
+
+		byte[] bytesToSign = _text2Sign.getBytes();
+		byte[] digitalSignature = Sign.makeDigitalSignature(bytesToSign, privateKey);
+		String _signatureText = printBase64Binary(digitalSignature);
+		return _signatureText;
+	}
+
+	public boolean verify (String send, String signatureValue, String text2verify) throws Exception	{
+
+		// verify signature
+		DigitalSignatureX509 Sign = new DigitalSignatureX509();
+		byte[] signatureBytes = parseBase64Binary(signatureValue);
+
+		String certificateFile = "keys//" + send + ".cer";
+		
+		X509CertificateCheck caCheck = new X509CertificateCheck();
+		// get the sender's public certificate file
+		Certificate certificate =Sign.readCertificateFile(certificateFile);
+		// get the CA's certificate and public key
+		Certificate caCertificate = caCheck.readCertificateFile(CA_CERT);
+		PublicKey caPublicKey = caCertificate.getPublicKey();
+
+		// check if the certificate is valid (signed by CA)
+		if (caCheck.verifySignedCertificate(certificate,caPublicKey)) {
+			System.out.println("The signed certificate is valid");
+		} else {
+			System.err.println("The signed certificate is not valid");
+			return false;
+		}				
+
+
+		PublicKey publicKey = certificate.getPublicKey();
+
+		// verify the signature
+		System.out.println("Verifying ...");
+		byte[] bytesToVerify = text2verify.getBytes();
+
+		boolean isValid = Sign.verifyDigitalSignature(signatureBytes, bytesToVerify, publicKey);
+
+		if (isValid) {
+			System.out.println("The digital signature is valid");
+			return true;
+		} else {
+			System.out.println("The digital signature is NOT valid");
+			return false;
+		}
+
 	}
 
 	public boolean handleFault(SOAPMessageContext smc) {
