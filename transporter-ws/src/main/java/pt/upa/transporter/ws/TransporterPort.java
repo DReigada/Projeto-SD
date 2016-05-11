@@ -27,7 +27,8 @@ public class TransporterPort implements TransporterPortType{
 
 	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
 	public static String TOKEN = "transporter";
-
+	public static String destinationEndpoint = "http://localhost:8080/broker-ws/endpoint";
+	
 	int lastMsgReceived = 0;
 	
 	@Resource
@@ -42,7 +43,9 @@ public class TransporterPort implements TransporterPortType{
 		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
 		
 		System.out.println("Contador recebido: " + SignatureHandler.counter);
-		
+		SignatureHandler.destination = destinationEndpoint;
+		System.out.println("Destino colocado: " + SignatureHandler.destination);
+
 		
 	/*	
 		// Get message counter value from context

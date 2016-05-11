@@ -26,6 +26,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static int counter = 0;
+	public static String destination = null;
 	
 	final static String KEYSTORE_PASSWORD = "ins3cur3";
 	final static String KEY_PASSWORD = "1nsecure";
@@ -94,6 +95,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				Name msgCounter = se.createName("MsgCounter", "e", REQUEST_NS);
 				SOAPHeaderElement counterElement = sh.addHeaderElement(msgCounter);
 				
+				Name destination = se.createName("Destination", "e", REQUEST_NS);
+				SOAPHeaderElement destinationElement = sh.addHeaderElement(destination);
+				
 				Name sender = se.createName("Sender", "e", REQUEST_NS);
 				SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
 				
@@ -101,7 +105,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 
-				counterElement.addTextNode(String.valueOf(counter));
+				counterElement.addTextNode(String.valueOf(SignatureHandler.counter));
+				destinationElement.addTextNode(SignatureHandler.destination);
 				senderElement.addTextNode(origin);
 				element.addTextNode(signatureText);
 
@@ -134,6 +139,16 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 					return true;
 				}
 				
+				// get msgcounter header element
+				Name destination = se.createName("Destination", "e", REQUEST_NS);
+				@SuppressWarnings("rawtypes")
+				Iterator it4 = sh.getChildElements(destination);
+				// check header element
+				if (!it4.hasNext()) {
+					return true;
+				}
+				SOAPElement destinationElement = (SOAPElement) it4.next();
+				System.out.println(destinationElement.getTextContent());
 				
 				// get msgcounter header element
 				Name counter = se.createName("MsgCounter", "e", REQUEST_NS);

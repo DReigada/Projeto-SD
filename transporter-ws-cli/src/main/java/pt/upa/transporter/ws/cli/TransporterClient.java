@@ -57,7 +57,12 @@ public class TransporterClient implements TransporterPortType{
 		SignatureHandler.counter++;
 		System.out.println("Contador depois: " + SignatureHandler.counter);
 		System.out.println("---------------------------");
-
+		
+		SignatureHandler.destination = destination;
+		System.out.println("---------------------------");
+		System.out.println("Destino: " + SignatureHandler.destination);
+		System.out.println("---------------------------");
+		
 	}
 	
 	@Override
