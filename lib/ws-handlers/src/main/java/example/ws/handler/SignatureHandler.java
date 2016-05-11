@@ -70,7 +70,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				char[] kPass = KEY_PASSWORD.toCharArray();
 				PrivateKey privateKey = sign.getPrivateKeyFromKeystore(keyStorePath, keyStorePass, kAlias, kPass);
 
-				String textToSign = origin + bodyText;
+				String textToSign = String.valueOf(SignatureHandler.counter) +
+									SignatureHandler.destination + origin + bodyText;
 				byte[] bytesToSign = textToSign.getBytes();
 
 				byte[] digitalSignature = sign.makeDigitalSignature(bytesToSign, privateKey);
@@ -168,7 +169,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				System.out.println(senderElement.getTextContent());
 
 				//create string to compare
-				String textToVerify = senderElement.getTextContent() + bodyText;
+				String textToVerify = String.valueOf(SignatureHandler.counter) + 
+						destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
 				byte[] bytesToVerify = textToVerify.getBytes();
 				
 				
