@@ -193,8 +193,8 @@
 		                    <mainClass>${mainclass}</mainClass>
 		                    <arguments>
 		                        <argument>${uddi.url}</argument>
-		                        <argument>${ws.name}</argument>
 		                        <argument>${backupws.url}</argument>
+		                        <argument>${ws.name}</argument>
 		                        <argument>y</argument>
 		                    </arguments>
 		                </configuration>
