@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.registry.JAXRException;
 
@@ -24,6 +25,7 @@ import pt.upa.transporter.ws.cli.TransporterClient;
   targetNamespace="http://ws.broker.upa.pt/",
   serviceName="BrokerService"
 )
+
 public class BrokerPort implements BrokerPortType {
 
   TransporterCompaniesManager _transportersManager;
