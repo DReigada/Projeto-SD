@@ -130,16 +130,19 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPElement signatureElement = getHeaderFromSOAP
 						(SIGN_HEADER, PREFIX, REQUEST_NS, se, sh);
 
-				SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
 
-				/*
-				// check counter validity
+				
+				// check counter and destination validity
 				if (verifyIDCounter(destinationElement.getTextContent(), Integer.parseInt(counterElement.getTextContent()))) {
+					System.out.println("-----------------------");
+					System.out.println("Message valid.");
 					SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
 				} else {
-					System.out.println("Message not valid.");
+					System.out.println("-----------------------");
+					System.out.println("Message NOT valid.");
 				}
-				*/
+
+				
 				// get header element value
 				String headerValue = signatureElement.getValue();
 				//create string to compare
@@ -160,13 +163,14 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 		return true;
 	}
 
-	private boolean verifyIDCounter(String destin, int counterChk) {
-		if (destin == selfB){
+	private boolean verifyIDCounter(String destin, int counterChk) {		
+		
+		if (destin.equals(selfB)){
 			if (counterChk == SignatureHandler.counter){
 				return true;
 			} else
 				return false;
-		} else if (destin == selfT){
+		} else if (destin.equals(selfT)){
 			if (SignatureHandler.counter == 0 && counterChk > 0){
 				return true;
 			}
