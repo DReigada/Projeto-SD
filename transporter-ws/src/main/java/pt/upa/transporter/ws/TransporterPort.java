@@ -28,9 +28,7 @@ public class TransporterPort implements TransporterPortType{
 	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
 	public static String TOKEN = "transporter";
 	public static String destinationEndpoint = "http://localhost:8080/broker-ws/endpoint";
-	
-	int lastMsgReceived = 0;
-	
+		
 	@Resource
 	private WebServiceContext webServiceContext;
 
@@ -46,22 +44,6 @@ public class TransporterPort implements TransporterPortType{
 		SignatureHandler.destination = destinationEndpoint;
 		System.out.println("Destino colocado: " + SignatureHandler.destination);
 
-		
-	/*	
-		// Get message counter value from context
-		int inboundMsgCounter = Integer.parseInt((String) messageContext.get(SignatureHandler.COUNTER_PROPERTY));
-		System.out.println("Inbound message counter received: " + inboundMsgCounter);
-		//ver se tenho que fazer o put com o contador novamente...
-		
-		// Check if message is repeated
-		if (inboundMsgCounter <= lastMsgReceived) {
-			System.out.println("Message has already been received");
-			// Do something
-		} else {
-			System.out.println("Message is new. ok to proceed");
-			// Do something
-		}
-		*/
 	}
 
 	Transporter _transporter;
@@ -70,6 +52,8 @@ public class TransporterPort implements TransporterPortType{
 	public TransporterPort(Transporter transporter) {
 		_transporter = transporter;
 		_jobSimulator = new JobStateSimulator();
+		SignatureHandler.selfT = "http://localhost:8081/transporter-ws/endpoint";
+
 	}
 
 	/**
