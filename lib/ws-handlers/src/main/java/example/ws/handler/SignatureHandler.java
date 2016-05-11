@@ -27,8 +27,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static int counter = 0;
 	public static String destination = null;
-	public static String selfB;
-	public static String selfT;
+	public static String selfB = " ";
+	public static String selfT = " ";
 
 	final static String KEYSTORE_PASSWORD = "ins3cur3";
 	final static String KEY_PASSWORD = "1nsecure";

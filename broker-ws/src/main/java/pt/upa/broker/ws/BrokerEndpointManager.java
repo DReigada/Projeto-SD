@@ -2,6 +2,7 @@ package pt.upa.broker.ws;
 
 import javax.xml.ws.Endpoint;
 
+import example.ws.handler.SignatureHandler;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 
 import javax.xml.registry.JAXRException;
@@ -37,6 +38,8 @@ public class BrokerEndpointManager {
     // publish to UDDI
     _uddiNaming = new UDDINaming(_uddiURL);
     _uddiNaming.rebind(_name, _url);
+	SignatureHandler.selfB = _url;
+
   }
 
   public void stop() {
