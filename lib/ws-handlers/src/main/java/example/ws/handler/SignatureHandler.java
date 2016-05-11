@@ -33,7 +33,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	final static String CA_CERT = "keys//ca-certificate.pem.txt";
 	
 	public static final String REQUEST_PROPERTY = "my.request.property";
-	//public static final String RESPONSE_PROPERTY = "my.response.property";
 
 	public static final String REQUEST_HEADER = "Signature";
 	public static final String REQUEST_NS = "urn:UPA";
@@ -42,7 +41,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	public static final String RESPONSE_NS = REQUEST_NS;
 
 	public static final String CLASS_NAME = SignatureHandlerClient.class.getSimpleName();
-	//public static final String COUNTER_PROPERTY = "my.message.counter";
 	
 	public boolean handleMessage(SOAPMessageContext smc) {
 		Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -52,10 +50,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 			// get token from request context - sender
 			String origin = (String) smc.get(REQUEST_PROPERTY);
 			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
-			
-
-			//String msgCounter = (String) smc.get(COUNTER_PROPERTY);
-
 
 			// put token in request SOAP header
 			try {
@@ -231,15 +225,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				} else {
 					System.out.println("The digital signature is NOT valid");
 				}
-				
-				/*
-				//put messageCounter on context
-				String msgCounter = counterElement.getTextContent();
-				smc.put(COUNTER_PROPERTY, msgCounter);
-				// set property scope to application so that server class can
-				// access property
-				smc.setScope(COUNTER_PROPERTY, Scope.APPLICATION);
-				 */
 
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);

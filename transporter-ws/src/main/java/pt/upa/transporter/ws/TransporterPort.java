@@ -46,22 +46,6 @@ public class TransporterPort implements TransporterPortType{
 		SignatureHandler.destination = destinationEndpoint;
 		System.out.println("Destino colocado: " + SignatureHandler.destination);
 
-		
-	/*	
-		// Get message counter value from context
-		int inboundMsgCounter = Integer.parseInt((String) messageContext.get(SignatureHandler.COUNTER_PROPERTY));
-		System.out.println("Inbound message counter received: " + inboundMsgCounter);
-		//ver se tenho que fazer o put com o contador novamente...
-		
-		// Check if message is repeated
-		if (inboundMsgCounter <= lastMsgReceived) {
-			System.out.println("Message has already been received");
-			// Do something
-		} else {
-			System.out.println("Message is new. ok to proceed");
-			// Do something
-		}
-		*/
 	}
 
 	Transporter _transporter;
@@ -159,7 +143,6 @@ public class TransporterPort implements TransporterPortType{
 	 * Stops the job simulator
 	 */
 	void stopSimulator(){
-		//handle();
 		_jobSimulator.stop();
 	}
 }
