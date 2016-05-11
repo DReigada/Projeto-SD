@@ -144,6 +144,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 					return true;
 				}
 				SOAPElement counterElement = (SOAPElement) it3.next();
+				SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
 				System.out.println(counterElement.getTextContent());
 				
 				// get sender header element
