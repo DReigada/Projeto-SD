@@ -310,6 +310,7 @@ public class BrokerPort implements BrokerPortType {
     _transports = new ArrayList<BrokerTransportView>();
     
     //clear the backup list
+    if(_backupPort == null) return;
     _backupPort.clearTransports();
   }
   
