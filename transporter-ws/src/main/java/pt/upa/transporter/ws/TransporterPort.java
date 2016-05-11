@@ -35,15 +35,16 @@ public class TransporterPort implements TransporterPortType{
 
 	public void handle() {
 		MessageContext messageContext = webServiceContext.getMessageContext();
-		//RESPONSE_PROPERTY = UpaBroker
-		//messageContext.put(SignatureHandlerServer.RESPONSE_PROPERTY, "UpaBroker");
 
 		TOKEN = _transporter.getName();
 		String newValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, newValue);
-		//REQUEST_PROPERTY = UpaTransporterX
 		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
 		
+		System.out.println("Contador recebido: " + SignatureHandler.counter);
+		
+		
+	/*	
 		// Get message counter value from context
 		int inboundMsgCounter = Integer.parseInt((String) messageContext.get(SignatureHandler.COUNTER_PROPERTY));
 		System.out.println("Inbound message counter received: " + inboundMsgCounter);
@@ -57,6 +58,7 @@ public class TransporterPort implements TransporterPortType{
 			System.out.println("Message is new. ok to proceed");
 			// Do something
 		}
+		*/
 	}
 
 	Transporter _transporter;

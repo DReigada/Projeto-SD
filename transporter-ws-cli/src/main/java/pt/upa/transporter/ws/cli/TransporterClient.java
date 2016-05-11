@@ -21,9 +21,11 @@ public class TransporterClient implements TransporterPortType{
 	public static final String TOKEN = "UpaBroker";
 	
 	TransporterPortType _port;
-	int counter = 0;
+	//int counter = 0;
 	BindingProvider bindingProvider;
 	Map<String, Object> requestContext;
+	
+	String destination;
 	
 	public TransporterClient(String endpointURL) {
         // get new port
@@ -32,22 +34,30 @@ public class TransporterClient implements TransporterPortType{
 
         bindingProvider = (BindingProvider) _port;
         requestContext = bindingProvider.getRequestContext();
-        requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);	
+        requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);	   
+
+        destination = endpointURL;
         
-
-
 	}
 	
 	public void handle() {
-        //1
-		counter = counter+1;
+        
+		//counter = counter+1;
+		
         // put token UpaBroker in request context
 		String initialValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);
 		requestContext.put(SignatureHandler.REQUEST_PROPERTY, initialValue);
-        
+      /*  
         String msgCounter = Integer.toString(counter);
         requestContext.put(SignatureHandler.COUNTER_PROPERTY, msgCounter);
+        */
+		System.out.println("---------------------------");
+		System.out.println("Contador antes: " + SignatureHandler.counter);
+		SignatureHandler.counter++;
+		System.out.println("Contador depois: " + SignatureHandler.counter);
+		System.out.println("---------------------------");
+
 	}
 	
 	@Override
