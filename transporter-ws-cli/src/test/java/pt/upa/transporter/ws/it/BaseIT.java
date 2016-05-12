@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.upa.transporter.ws.cli.CounterBackup;
 import pt.upa.transporter.ws.cli.TransporterClient;
 
 /**
@@ -18,13 +19,16 @@ import pt.upa.transporter.ws.cli.TransporterClient;
  *  Should invoke "live" remote servers 
  */
 public class BaseIT {
-
+	private static class mockCounterBackup implements CounterBackup{
+		@Override
+		public void updateMessageCounter(int val) {	}
+	}
 	private static final String TEST_PROP_FILE = "/test.properties";
 	private static Properties props = null;
 	
 	protected static TransporterClient transporter1 = null,
 										transporter2 = null;
-
+	
 
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
@@ -44,8 +48,8 @@ public class BaseIT {
 		String endpointAddress1 = uddiNaming.lookup(transporterBaseName + "1");
 		String endpointAddress2 = uddiNaming.lookup(transporterBaseName + "2");	
 
-		transporter1 = new TransporterClient(endpointAddress1);
-		transporter2 = new TransporterClient(endpointAddress2);
+		transporter1 = new TransporterClient(endpointAddress1, new mockCounterBackup());
+		transporter2 = new TransporterClient(endpointAddress2, new mockCounterBackup());
     }
 
     @AfterClass
