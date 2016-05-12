@@ -8,9 +8,11 @@ import pt.upa.broker.ws.Broker;
 import pt.upa.broker.ws.BrokerPort;
 import pt.upa.broker.ws.BrokerTransportView;
 import pt.upa.broker.ws.TransportView;
+import pt.upa.transporter.ws.cli.CounterBackup;
+import security.ws.handler.SignatureHandler;
 
 @WebService(endpointInterface = "pt.upa.broker.backup.ws.BrokerBackup")
-public class BrokerBackupPort implements BrokerBackup{
+public class BrokerBackupPort implements BrokerBackup, CounterBackup{
 	
 	
 	private BrokerPort _port;
@@ -38,8 +40,7 @@ public class BrokerBackupPort implements BrokerBackup{
 
 	@Override
 	public void updateMessageCounter(int val) {
-		// TODO Auto-generated method stub
-		
+		SignatureHandler.counter = val;
 	}
 	
 	@Override

@@ -338,6 +338,7 @@ public class BrokerPort implements BrokerPortType {
 
   public void setBackupPort(BrokerBackup port){
 	  _backupPort = port;
+	  _transportersManager.setBackupPort(_backupPort);
   }
   
   private TransportStateView convertToTransportStateView(JobStateView state) throws 

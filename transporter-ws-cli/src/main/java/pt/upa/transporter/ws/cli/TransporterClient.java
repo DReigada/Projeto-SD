@@ -27,8 +27,9 @@ public class TransporterClient implements TransporterPortType{
 	Map<String, Object> requestContext;
 	
 	String destination;
+	private CounterBackup _counterBackup;
 	
-	public TransporterClient(String endpointURL) {
+	public TransporterClient(String endpointURL, CounterBackup counterBackup) {
         // get new port
         TransporterService service = new TransporterService();
         _port = service.getTransporterPort();
@@ -38,7 +39,7 @@ public class TransporterClient implements TransporterPortType{
         requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);	   
 
         destination = endpointURL;
-        
+        _counterBackup = counterBackup;
 	}
 	
 	public void handle() {
@@ -51,6 +52,7 @@ public class TransporterClient implements TransporterPortType{
 		System.out.println("---------------------------");
 		System.out.println("Contador antes: " + SignatureHandler.counter);
 		SignatureHandler.counter++;
+		_counterBackup.updateMessageCounter(SignatureHandler.counter); //update the counter on the backup
 		System.out.println("Contador depois: " + SignatureHandler.counter);
 		System.out.println("---------------------------");
 		

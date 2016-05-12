@@ -7,6 +7,9 @@ import java.util.Map;
 import javax.xml.registry.JAXRException;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.upa.broker.backup.ws.BrokerBackup;
+import pt.upa.broker.backup.ws.CounterBackupAdapter;
+import pt.upa.transporter.ws.cli.CounterBackup;
 import pt.upa.transporter.ws.cli.TransporterClient;
 
 public class TransporterCompaniesManager {
@@ -15,9 +18,11 @@ public class TransporterCompaniesManager {
   private UDDINaming _uddiNaming; 
   private final static String TRANSPORTERS_NAME_REGEX = "UpaTransporter%";
   private Map<String, TransporterClient> _transporterCompaniesPorts;
+  private CounterBackup _counterBackup;
   
 
   public TransporterCompaniesManager() {
+	_counterBackup = new CounterBackupAdapter(null);
     reconnectUDDI();
     _transporterCompaniesPorts = new HashMap<String, TransporterClient>();
   }
@@ -64,7 +69,7 @@ public class TransporterCompaniesManager {
         transporter = _transporterCompaniesPorts.get(transporterEndpoint);
 
       } else {
-    	  transporter = new TransporterClient(transporterEndpoint);
+    	  transporter = new TransporterClient(transporterEndpoint, _counterBackup);
       }
 
       // add port to known registered transporters
@@ -75,6 +80,10 @@ public class TransporterCompaniesManager {
     _transporterCompaniesPorts = newTransporterCompaniesPorts;
 
     return newTransporterCompaniesPorts.values();
+  }
+  
+  public void setBackupPort(BrokerBackup backupPort){
+	  _counterBackup = new CounterBackupAdapter(backupPort); 
   }
 
   private void reconnectUDDI(){
