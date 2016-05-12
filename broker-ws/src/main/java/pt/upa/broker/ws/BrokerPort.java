@@ -29,7 +29,7 @@ import pt.upa.transporter.ws.cli.TransporterClient;
 public class BrokerPort implements BrokerPortType {
 
   TransporterCompaniesManager _transportersManager;
-  List<BrokerTransportView> _transports;
+  public List<BrokerTransportView> _transports;
   private BrokerBackup _backupPort;
 
   public BrokerPort() {
