@@ -160,6 +160,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				System.out.printf("%s put signature '%s' on request message header%n", CLASS_NAME, signatureText);
 
+				return true;
+
 			} catch (SOAPException e) {
 				System.out.printf("Failed to add SOAP header because of %s%n", e);
 				System.exit(1);
@@ -182,7 +184,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// check body:
 				String bodyText = sb.getTextContent().toString();
 
-				// check  header 
+				// check header 
 				if (sh == null) {
 					System.out.println("Header not found.");
 					return false;
@@ -216,7 +218,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				String headerValue = signatureElement.getValue();
 				//create string to compare
 				String textToVerify = String.valueOf(SignatureHandler.counter) + 
-						destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
+
+				destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
 				
 				// verify signature
 				String certificateToDecode = senderCerElement.getTextContent();
@@ -228,7 +231,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// put sender in destination variable.
 				// in next outbound call, this value will be used to send the message to the right place
 				SignatureHandler.destination = senderElement.getTextContent();
-				
+				return true;
 				
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
@@ -239,6 +242,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 			}
 
 		}
-		return true;
+		return false;
 	}
 }
