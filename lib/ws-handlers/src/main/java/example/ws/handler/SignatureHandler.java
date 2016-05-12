@@ -44,6 +44,58 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	public static final String CLASS_NAME = SignatureHandler.class.getSimpleName();
 
 	public boolean handleMessage(SOAPMessageContext smc) {
+		return handleAll(smc);
+	}
+	
+	public boolean handleFault(SOAPMessageContext smc) {
+		return handleAll(smc);
+	}
+	
+	public Set<QName> getHeaders() {
+		return null;
+	}
+	
+	public void close(MessageContext messageContext) {
+	}
+
+	private boolean verifyIDCounter(String destin, int counterChk) {		
+		
+		if (destin.equals(selfB)){
+			if (counterChk == SignatureHandler.counter){
+				return true;
+			} else
+				return false;
+		} else if (destin.equals(selfT)){
+			if (SignatureHandler.counter == 0 && counterChk > 0){
+				return true;
+				//return false;
+			}
+			else if (counterChk > SignatureHandler.counter) {
+				return true;
+				//return false;
+			}	
+		}
+
+		return false;
+
+	}
+
+	public SOAPElement getHeaderFromSOAP
+	(String name, String prefix, String namespace, SOAPEnvelope soapE, SOAPHeader soapH) throws SOAPException {
+		SOAPEnvelope _se = soapE;
+		SOAPHeader _sh = soapH;
+		Name destination = _se.createName(name, prefix, namespace);
+		@SuppressWarnings("rawtypes")
+		Iterator it = _sh.getChildElements(destination);
+		// check header element
+		if (!it.hasNext()) {
+			return null;
+		}
+		SOAPElement element = (SOAPElement) it.next();
+		return element;
+	}
+
+	private boolean handleAll(SOAPMessageContext smc){
 		Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 		SignatureManager sigManager = new SignatureManager(KEYSTORE_PASSWORD, KEY_PASSWORD, CA_CERT);
 
@@ -138,6 +190,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				} else {
 					System.out.println("-----------------------");
 					System.out.println("Message NOT valid.");
+					return false;
 				}
 
 				
@@ -160,51 +213,4 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 		}
 		return true;
 	}
-
-	private boolean verifyIDCounter(String destin, int counterChk) {		
-		
-		if (destin.equals(selfB)){
-			if (counterChk == SignatureHandler.counter){
-				return true;
-			} else
-				return false;
-		} else if (destin.equals(selfT)){
-			if (SignatureHandler.counter == 0 && counterChk > 0){
-				return true;
-			}
-			else if (counterChk > SignatureHandler.counter) {
-				return true;
-			}	
-		}
-
-		return false;
-
-	}
-
-	public SOAPElement getHeaderFromSOAP
-	(String name, String prefix, String namespace, SOAPEnvelope soapE, SOAPHeader soapH) throws SOAPException {
-		SOAPEnvelope _se = soapE;
-		SOAPHeader _sh = soapH;
-		Name destination = _se.createName(name, prefix, namespace);
-		@SuppressWarnings("rawtypes")
-		Iterator it = _sh.getChildElements(destination);
-		// check header element
-		if (!it.hasNext()) {
-			return null;
-		}
-		SOAPElement element = (SOAPElement) it.next();
-		return element;
-	}
-
-	public boolean handleFault(SOAPMessageContext smc) {
-		return true;
-	}
-
-	public Set<QName> getHeaders() {
-		return null;
-	}
-
-	public void close(MessageContext messageContext) {
-	}
-
 }
