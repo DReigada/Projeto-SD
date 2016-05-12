@@ -19,6 +19,8 @@ public abstract class AbstractHandlerTest {
 
     // static members
 
+    protected static final String BODY_TEXT = "friend";
+
     /** hello-ws SOAP request message captured with LoggingHandler */
     protected static final String HELLO_SOAP_REQUEST = "<S:Envelope " +
     "xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
@@ -26,7 +28,7 @@ public abstract class AbstractHandlerTest {
     "<SOAP-ENV:Header/>" +
     "<S:Body>" +
     "<ns2:sayHello xmlns:ns2=\"http://ws.example/\">" +
-    "<arg0>friend</arg0>" +
+    "<arg0>" + BODY_TEXT + "</arg0>" +
     "</ns2:sayHello>" +
     "</S:Body></S:Envelope>";
 

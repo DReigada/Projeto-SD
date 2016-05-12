@@ -7,13 +7,13 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import javax.xml.soap.Name;
+import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
 
         final SOAPMessage soapMessage = byteArrayToSOAPMessage(soapText.getBytes());
         final Boolean soapOutbound = true;
-        
+
         SignatureHandler.counter = RANDOM_COUNTER;
         SignatureHandler.destination = RANDOM_TRANSPORTER_COMPANY;
 
@@ -106,6 +106,11 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         it = soapHeader.getChildElements(name);
         assertTrue(it.hasNext());
        
+        /* assert if body is unchanged */
+        SOAPBody sbody = soapEnvelope.getBody();
+        assertNotNull(sbody);
+        String bodyText = sbody.getTextContent().toString();
+        assertEquals(BODY_TEXT, bodyText);
     }
 
     /*@Test
