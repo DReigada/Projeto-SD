@@ -52,7 +52,6 @@ public class TransporterPort implements TransporterPortType{
 	public TransporterPort(Transporter transporter) {
 		_transporter = transporter;
 		_jobSimulator = new JobStateSimulator();
-		SignatureHandler.selfT = "http://localhost:8081/transporter-ws/endpoint";
 
 	}
 

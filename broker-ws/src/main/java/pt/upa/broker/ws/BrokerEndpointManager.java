@@ -9,6 +9,7 @@ import javax.xml.registry.JAXRException;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
+import example.ws.handler.SignatureHandler;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.broker.backup.ws.BrokerBackup;
 import pt.upa.broker.backup.ws.BrokerBackupService;
@@ -53,6 +54,8 @@ public class BrokerEndpointManager implements EndpointManager{
     // publish to UDDI
     _uddiNaming = new UDDINaming(_uddiURL);
     _uddiNaming.rebind(_name, _url);
+	SignatureHandler.selfB = _url;
+
   }
   
   public void connectToBackup(String backupName) throws JAXRException{
