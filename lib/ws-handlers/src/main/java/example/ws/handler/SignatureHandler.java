@@ -50,6 +50,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	public boolean handleMessage(SOAPMessageContext smc) {
 		Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 		if (outbound) {
+
 			// get token from request context - sender
 			String origin = (String) smc.get(REQUEST_PROPERTY);
 			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
@@ -64,9 +65,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// get body text to sign:
 				String bodyText = sb.getTextContent().toString();
 				String textToSign = String.valueOf(SignatureHandler.counter) +
-						SignatureHandler.destination + origin + bodyText;
+				SignatureHandler.destination + origin + bodyText;
 
-				// Sign!
+				// Sign
 				String signatureText = sign(origin, textToSign);
 
 				// add header
@@ -86,7 +87,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				Name name = se.createName(SIGN_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement element = sh.addHeaderElement(name);
-
 
 				counterElement.addTextNode(String.valueOf(SignatureHandler.counter));
 				destinationElement.addTextNode(SignatureHandler.destination);
@@ -210,6 +210,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 		byte[] bytesToSign = _text2Sign.getBytes();
 		byte[] digitalSignature = Sign.makeDigitalSignature(bytesToSign, privateKey);
 		String _signatureText = printBase64Binary(digitalSignature);
+
 		return _signatureText;
 	}
 

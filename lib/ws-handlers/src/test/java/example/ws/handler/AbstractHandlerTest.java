@@ -51,14 +51,24 @@ public abstract class AbstractHandlerTest {
             throw new RuntimeException(e);
         }
     }
-
+    
+    protected static final String RANDOM_BROKER = "Brokerxyz";
+    protected static final String RANDOM_TRANSPORTER_COMPANY = "Transporterxyz";
+    protected static final int RANDOM_COUNTER = 33231;
+    protected static final String REQUEST_PROPERTY = "my.request.property";
+    
+    public static final String REQUEST_NS = "urn:UPA";
+    public static final String MSGCOUNTER_HEADER = "MsgCounter";
+	public static final String SENDER_HEADER = "Sender";
+	public static final String DESTINATION_HEADER = "Destination";
+	public static final String PREFIX = "e";
 
     // helper functions
 
     protected static SOAPMessage byteArrayToSOAPMessage(byte[] msg) throws Exception {
         ByteArrayInputStream byteInStream = new ByteArrayInputStream(msg);
         StreamSource source = new StreamSource(byteInStream);
-        SOAPMessage newMsg = newMsg = MESSAGE_FACTORY.createMessage();
+        SOAPMessage newMsg = MESSAGE_FACTORY.createMessage();
         SOAPPart soapPart = newMsg.getSOAPPart();
         soapPart.setContent(source);
         return newMsg;
