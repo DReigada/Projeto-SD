@@ -145,10 +145,14 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				System.out.printf("%s put signature '%s' on request message header%n", CLASS_NAME, signatureText);
 
+				return true;
+
 			} catch (SOAPException e) {
 				System.out.printf("Failed to add SOAP header because of %s%n", e);
+				return false;
 			} catch (Exception e) {
 				System.out.printf("Failed to add Signature header because of %s%n", e);
+				return false;
 			}
 
 		} else {
@@ -198,19 +202,21 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				String headerValue = signatureElement.getValue();
 				//create string to compare
 				String textToVerify = String.valueOf(SignatureHandler.counter) + 
-						destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
+				destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
+
 				// verify signature
-				sigManager.verify(senderElement.getTextContent(), headerValue, textToVerify);
+				return sigManager.verify(senderElement.getTextContent(), headerValue, textToVerify);
 
 
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
+				return false;
 			} catch (Exception e) {
 				System.out.printf("Exception caught", e);
+				return false;
 
 			}
 
 		}
-		return true;
 	}
 }
