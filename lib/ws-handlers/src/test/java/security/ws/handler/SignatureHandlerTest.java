@@ -67,18 +67,13 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         // assert that message would proceed normally
         assertTrue(handleResult);
         
-        // TODO: remove print
-        System.out.println("Message: ");
-        soapMessage.writeTo(System.out);
-        System.out.println(); // just to add a newline to output
-        
-        // assert header
+        // assert Signature
         SOAPPart soapPart = soapMessage.getSOAPPart();
         SOAPEnvelope soapEnvelope = soapPart.getEnvelope();
         SOAPHeader soapHeader = soapEnvelope.getHeader();
         assertNotNull(soapHeader);
 
-        /* assert header element */
+        /* assert Signature element */
         // counter element
         Name name = soapEnvelope.createName(MSGCOUNTER_HEADER, PREFIX, REQUEST_NS);
         Iterator it = soapHeader.getChildElements(name);
@@ -105,23 +100,33 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         element = (SOAPElement) it.next();
         valueString = element.getValue();
         assertEquals(RANDOM_BROKER, valueString);
-        
+
+        // signature element (only checks if signature is present)
+        name = soapEnvelope.createName(SIGN_HEADER, "e", REQUEST_NS);
+        it = soapHeader.getChildElements(name);
+        assertTrue(it.hasNext());
+       
     }
 
     /*@Test
-    public void testHeaderHandlerInbound(
+    public void testSignatureHandlerInbound(
         @Mocked final SOAPMessageContext soapMessageContext)
         throws Exception {
 
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST.replace("<SOAP-ENV:Header/>",
             "<SOAP-ENV:Header>" +
-            "<d:myHeader xmlns:d=\"http://demo\">22</d:myHeader>" +
+            "<d:mySignature xmlns:d=\"http://demo\">22</d:mySignature>" +
             "</SOAP-ENV:Header>");
         //System.out.println(soapText);
 
         final SOAPMessage soapMessage = byteArrayToSOAPMessage(soapText.getBytes());
         final Boolean soapOutbound = false;
+
+        // TODO: remove print
+        System.out.println("Message: ");
+        soapMessage.writeTo(System.out);
+        System.out.println(); // just to add a newline to output
 
         // an "expectation block"
         // One or more invocations to mocked types, causing expectations to be recorded.
@@ -132,12 +137,12 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
             soapMessageContext.getMessage();
             result = soapMessage;
 
-            soapMessageContext.put(HeaderHandler.CONTEXT_PROPERTY, 22);
-            soapMessageContext.setScope(HeaderHandler.CONTEXT_PROPERTY, Scope.APPLICATION);
+            soapMessageContext.put(SignatureHandler.CONTEXT_PROPERTY, 22);
+            soapMessageContext.setScope(SignatureHandler.CONTEXT_PROPERTY, Scope.APPLICATION);
         }};
 
         // Unit under test is exercised.
-        HeaderHandler handler = new HeaderHandler();
+        SignatureHandler handler = new SignatureHandler();
         boolean handleResult = handler.handleMessage(soapMessageContext);
 
         // Additional verification code, if any, either here or before the verification block.

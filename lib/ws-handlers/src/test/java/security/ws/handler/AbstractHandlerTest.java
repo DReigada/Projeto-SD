@@ -61,6 +61,7 @@ public abstract class AbstractHandlerTest {
     public static final String MSGCOUNTER_HEADER = "MsgCounter";
 	public static final String SENDER_HEADER = "Sender";
 	public static final String DESTINATION_HEADER = "Destination";
+    public static final String SIGN_HEADER = "Signature";
 	public static final String PREFIX = "e";
 
     // helper functions
