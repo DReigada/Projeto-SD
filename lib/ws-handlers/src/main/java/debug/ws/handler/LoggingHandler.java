@@ -1,4 +1,4 @@
-package example.ws.handler;
+package debug.ws.handler;
 
 import java.util.Set;
 

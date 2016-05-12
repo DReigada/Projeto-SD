@@ -9,7 +9,7 @@ import javax.xml.registry.JAXRException;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
-import example.ws.handler.SignatureHandler;
+import security.ws.handler.SignatureHandler;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.broker.backup.ws.BrokerBackup;
 import pt.upa.broker.backup.ws.BrokerBackupService;

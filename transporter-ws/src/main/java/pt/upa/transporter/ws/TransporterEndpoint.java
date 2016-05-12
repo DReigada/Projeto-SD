@@ -3,7 +3,7 @@ package pt.upa.transporter.ws;
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.Endpoint;
 
-import example.ws.handler.SignatureHandler;
+import security.ws.handler.SignatureHandler;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.transporter.core.Transporter;
 
