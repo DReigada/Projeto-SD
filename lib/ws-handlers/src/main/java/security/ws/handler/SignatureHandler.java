@@ -162,8 +162,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 			} catch (SOAPException e) {
 				System.out.printf("Failed to add SOAP header because of %s%n", e);
+				System.exit(1);
 			} catch (Exception e) {
 				System.out.printf("Failed to add Signature header because of %s%n", e);
+				System.exit(1);
 			}
 
 		} else {
@@ -183,7 +185,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// check  header 
 				if (sh == null) {
 					System.out.println("Header not found.");
-					return true;
+					return false;
 				}
 
 				SOAPElement destinationElement = getHeaderFromSOAP
@@ -219,7 +221,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// verify signature
 				String certificateToDecode = senderCerElement.getTextContent();
 				Certificate pubCert = sigManager.decodeCer(certificateToDecode);
-				sigManager.verifyAlt(pubCert, headerValue, textToVerify);
+				if(!sigManager.verifyAlt(pubCert, headerValue, textToVerify)){
+					return false;
+				}
 
 				// put sender in destination variable.
 				// in next outbound call, this value will be used to send the message to the right place
@@ -228,9 +232,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
+				System.exit(1);
 			} catch (Exception e) {
 				System.out.printf("Exception caught", e);
-
+				System.exit(1);
 			}
 
 		}
