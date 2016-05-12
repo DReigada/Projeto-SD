@@ -1,5 +1,6 @@
 package security.ws.handler;
 
+import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -31,6 +32,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	final static String CA_CERT = "keys//ca-certificate.pem.txt";
 
 	public static final String REQUEST_PROPERTY = "my.request.property";
+	public static final String SENDER_PROPERTY = "my.sender.property";
+
 
 	public static final String SIGN_HEADER = "Signature";
 	public static final String REQUEST_NS = "urn:UPA";
@@ -38,6 +41,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	public static final String MSGCOUNTER_HEADER = "MsgCounter";
 	public static final String SENDER_HEADER = "Sender";
 	public static final String DESTINATION_HEADER = "Destination";
+	public static final String SENDERCER_HEADER = "SenderCer";
 	public static final String PREFIX = "e";
 
 
@@ -103,9 +107,16 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 			// get token from request context - sender
 			String origin = (String) smc.get(REQUEST_PROPERTY);
+			String originURL = (String) smc.get(SENDER_PROPERTY);
+
 			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
+			
+			// get public certificate to send to destination via SOAP header
+			// ready to go
 
 			try {
+				String ownCer = sigManager.getOwnCer(origin);
+				
 				// get SOAP envelope
 				SOAPMessage msg = smc.getMessage();
 				SOAPPart sp = msg.getSOAPPart();
@@ -115,7 +126,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// get body text to sign:
 				String bodyText = sb.getTextContent().toString();
 				String textToSign = String.valueOf(SignatureHandler.counter) +
-				SignatureHandler.destination + origin + bodyText;
+				SignatureHandler.destination + originURL + bodyText;
 
 				// Sign
 				String signatureText = sigManager.sign(origin, textToSign);
@@ -134,13 +145,17 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				Name sender = se.createName(SENDER_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
+				
+				Name senderCer = se.createName(SENDERCER_HEADER, "e", REQUEST_NS);
+				SOAPHeaderElement senderCerElement = sh.addHeaderElement(senderCer);
 
 				Name name = se.createName(SIGN_HEADER, "e", REQUEST_NS);
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 				counterElement.addTextNode(String.valueOf(SignatureHandler.counter));
 				destinationElement.addTextNode(SignatureHandler.destination);
-				senderElement.addTextNode(origin);
+				senderElement.addTextNode(originURL);
+				senderCerElement.addTextNode(ownCer);
 				element.addTextNode(signatureText);
 
 				System.out.printf("%s put signature '%s' on request message header%n", CLASS_NAME, signatureText);
@@ -149,10 +164,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 			} catch (SOAPException e) {
 				System.out.printf("Failed to add SOAP header because of %s%n", e);
-				return false;
+				System.exit(1);
 			} catch (Exception e) {
 				System.out.printf("Failed to add Signature header because of %s%n", e);
-				return false;
+				System.exit(1);
 			}
 
 		} else {
@@ -181,9 +196,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 						(MSGCOUNTER_HEADER, PREFIX, REQUEST_NS, se, sh);	
 				SOAPElement senderElement = getHeaderFromSOAP
 						(SENDER_HEADER, PREFIX, REQUEST_NS, se, sh);
+				SOAPElement senderCerElement = getHeaderFromSOAP
+						(SENDERCER_HEADER, PREFIX, REQUEST_NS, se, sh);
 				SOAPElement signatureElement = getHeaderFromSOAP
 						(SIGN_HEADER, PREFIX, REQUEST_NS, se, sh);
-
 
 				
 				// check counter and destination validity
@@ -202,21 +218,30 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				String headerValue = signatureElement.getValue();
 				//create string to compare
 				String textToVerify = String.valueOf(SignatureHandler.counter) + 
+
 				destinationElement.getTextContent() + senderElement.getTextContent() + bodyText;
-
+				
 				// verify signature
-				return sigManager.verify(senderElement.getTextContent(), headerValue, textToVerify);
+				String certificateToDecode = senderCerElement.getTextContent();
+				Certificate pubCert = sigManager.decodeCer(certificateToDecode);
+				if(!sigManager.verifyAlt(pubCert, headerValue, textToVerify)){
+					return false;
+				}
 
-
+				// put sender in destination variable.
+				// in next outbound call, this value will be used to send the message to the right place
+				SignatureHandler.destination = senderElement.getTextContent();
+				return true;
+				
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
-				return false;
+				System.exit(1);
 			} catch (Exception e) {
 				System.out.printf("Exception caught", e);
-				return false;
-
+				System.exit(1);
 			}
 
 		}
+		return false;
 	}
 }

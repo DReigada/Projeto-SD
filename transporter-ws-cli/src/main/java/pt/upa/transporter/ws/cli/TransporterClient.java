@@ -7,13 +7,15 @@ import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
-import security.ws.handler.SignatureHandler;
+import com.sun.xml.ws.streaming.XMLStreamReaderException;
+
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
 import pt.upa.transporter.ws.JobView;
 import pt.upa.transporter.ws.TransporterPortType;
 import pt.upa.transporter.ws.TransporterService;
+import security.ws.handler.SignatureHandler;
 
 public class TransporterClient implements TransporterPortType{
 	
@@ -25,8 +27,9 @@ public class TransporterClient implements TransporterPortType{
 	Map<String, Object> requestContext;
 	
 	String destination;
+	private CounterBackup _counterBackup;
 	
-	public TransporterClient(String endpointURL) {
+	public TransporterClient(String endpointURL, CounterBackup counterBackup) {
         // get new port
         TransporterService service = new TransporterService();
         _port = service.getTransporterPort();
@@ -36,7 +39,7 @@ public class TransporterClient implements TransporterPortType{
         requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);	   
 
         destination = endpointURL;
-        
+        _counterBackup = counterBackup;
 	}
 	
 	public void handle() {
@@ -45,10 +48,14 @@ public class TransporterClient implements TransporterPortType{
 		String initialValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);
 		requestContext.put(SignatureHandler.REQUEST_PROPERTY, initialValue);
-  
+		requestContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfB);
+
+		
+		
 		System.out.println("---------------------------");
 		System.out.println("Contador antes: " + SignatureHandler.counter);
 		SignatureHandler.counter++;
+		_counterBackup.updateMessageCounter(SignatureHandler.counter); //update the counter on the backup
 		System.out.println("Contador depois: " + SignatureHandler.counter);
 		System.out.println("---------------------------");
 		
@@ -62,14 +69,22 @@ public class TransporterClient implements TransporterPortType{
 	public String ping(String name) {
 		
 		handle();
-		return _port.ping(name);
+		try{
+			return _port.ping(name);
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
 	public JobView requestJob(String origin, String destination, int price)
 			throws BadLocationFault_Exception, BadPriceFault_Exception {
 		handle();
-		return _port.requestJob(origin, destination, price);
+		try{
+			return _port.requestJob(origin, destination, price);
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
@@ -81,22 +96,31 @@ public class TransporterClient implements TransporterPortType{
 	@Override
 	public JobView jobStatus(String id) {
 		handle();
-		return _port.jobStatus(id);
+		try{
+			return _port.jobStatus(id);
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
 	public List<JobView> listJobs() {
 		handle();
-		return _port.listJobs();
+		try{
+			return _port.listJobs();
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
 	public void clearJobs() {
 		handle();
-		_port.clearJobs();
+		try{
+			_port.clearJobs();
+		} catch(XMLStreamReaderException e){
+			return;
+		}
 	}
-
-	
-
 	
 }
