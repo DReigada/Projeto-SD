@@ -3,6 +3,7 @@ package pt.upa.transporter.ws;
 import javax.xml.registry.JAXRException;
 import javax.xml.ws.Endpoint;
 
+import example.ws.handler.SignatureHandler;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.upa.transporter.core.Transporter;
 
@@ -70,6 +71,7 @@ public class TransporterEndpoint{
 			_uddiNaming = new UDDINaming(_uddiURL);
 			_uddiNaming.rebind(_transporter.getName(), _endpointURL);
 			_isRunning = true;
+			SignatureHandler.selfT = _endpointURL;
 		}
 		catch(JAXRException e){
 			System.err.printf("Caught exception when binding the service at: %s [%s]%n", _uddiURL, e);
