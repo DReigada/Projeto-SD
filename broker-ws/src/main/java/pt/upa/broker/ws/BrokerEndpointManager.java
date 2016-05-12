@@ -1,32 +1,48 @@
 package pt.upa.broker.ws;
 
-import javax.xml.ws.Endpoint;
+import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 
-import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import java.util.Map;
+import java.util.Timer;
 
 import javax.xml.registry.JAXRException;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Endpoint;
 
-public class BrokerEndpointManager {
+import security.ws.handler.SignatureHandler;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.upa.broker.backup.ws.BrokerBackup;
+import pt.upa.broker.backup.ws.BrokerBackupService;
+import pt.upa.broker.backup.ws.ImAliveTask;
+
+public class BrokerEndpointManager implements EndpointManager{
 
   private String _uddiURL;
   private String _name;
   private String _url;
   private Endpoint _endpoint;
   private UDDINaming _uddiNaming;
+  private BrokerPort _port;
+  private Timer _imAliveTimer;
   
   public BrokerEndpointManager(String uddiURL) {
-    _uddiURL = uddiURL;
-    _endpoint = null;
-    _name = _url = null;
-    _uddiNaming = null;
+	  this(uddiURL, new BrokerPort());
+  }
+  
+  public BrokerEndpointManager(String uddiURL, BrokerPort brokerPort){
+	    _uddiURL = uddiURL;
+	    _endpoint = null;
+	    _name = _url = null;
+	    _uddiNaming = null;
+	    
+	    _port = brokerPort;
   }
 
   public void start(String url) {
     _url = url;
     
-    BrokerPort port = new BrokerPort();
-    _endpoint = Endpoint.create(port);
-
+    _endpoint = Endpoint.create(_port);
+ 
     // publish endpoint
     _endpoint.publish(_url);
   }
@@ -34,12 +50,41 @@ public class BrokerEndpointManager {
   public void awaitConnections(String name) throws 
      JAXRException {
     _name = name;
+    
     // publish to UDDI
     _uddiNaming = new UDDINaming(_uddiURL);
     _uddiNaming.rebind(_name, _url);
+	SignatureHandler.selfB = _url;
+
+  }
+  
+  public void connectToBackup(String backupName) throws JAXRException{
+    UDDINaming uddiNaming = new UDDINaming(_uddiURL);
+    String endpointURL = uddiNaming.lookup(backupName);
+    
+    if(endpointURL == null){
+    	System.out.println("Backup server not found (backup will not be used)");
+    	return;
+    }
+    BrokerBackupService backupService = new BrokerBackupService();
+    BrokerBackup backupPort = backupService.getBrokerBackupPort();
+    
+    BindingProvider bindingProvider = (BindingProvider) backupPort;
+    Map<String, Object> requestContext = bindingProvider.getRequestContext();
+    requestContext.put(ENDPOINT_ADDRESS_PROPERTY, endpointURL);
+    
+    _port.setBackupPort(backupPort);
+    
+    _imAliveTimer = new Timer(true);
+    ImAliveTask imAliveTask = new ImAliveTask(backupPort);
+    _imAliveTimer.schedule(imAliveTask, 0, Broker.TIME_BETWEEN_PINGS);
   }
 
   public void stop() {
+	// stop the connection to the backup server
+	if(_imAliveTimer != null)
+		_imAliveTimer.cancel();
+	
     try {
       if (_endpoint != null) {
         // stop endpoint
