@@ -165,10 +165,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// check body:
 				String bodyText = sb.getTextContent().toString();
 
-				// check  header 
+				// check header 
 				if (sh == null) {
 					System.out.println("Header not found.");
-					return true;
+					return false;
 				}
 
 				SOAPElement destinationElement = getHeaderFromSOAP

@@ -49,7 +49,7 @@ public class SignatureManager {
 		
 		X509CertificateCheck caCheck = new X509CertificateCheck();
 		// get the sender's public certificate file
-		Certificate certificate =Sign.readCertificateFile(certificateFile);
+		Certificate certificate = Sign.readCertificateFile(certificateFile);
 		// get the CA's certificate and public key
 		Certificate caCertificate = caCheck.readCertificateFile(_caCert);
 		PublicKey caPublicKey = caCertificate.getPublicKey();
