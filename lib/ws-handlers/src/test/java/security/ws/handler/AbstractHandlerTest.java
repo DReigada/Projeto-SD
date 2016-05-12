@@ -67,13 +67,16 @@ public abstract class AbstractHandlerTest {
     protected static final String RANDOM_BROKER = "Brokerxyz";
     protected static final String RANDOM_TRANSPORTER_COMPANY = "Transporterxyz";
     protected static final int RANDOM_COUNTER = 33231;
+
     protected static final String REQUEST_PROPERTY = "my.request.property";
-    
+    protected static final String SENDER_PROPERTY = "my.sender.property";
+
     public static final String REQUEST_NS = "urn:UPA";
     public static final String MSGCOUNTER_HEADER = "MsgCounter";
 	public static final String SENDER_HEADER = "Sender";
 	public static final String DESTINATION_HEADER = "Destination";
     public static final String SIGN_HEADER = "Signature";
+    public static final String SENDERCER_HEADER = "SenderCer";
 	public static final String PREFIX = "e";
 
     // helper functions
@@ -99,6 +102,9 @@ public abstract class AbstractHandlerTest {
         String textToSign = RANDOM_COUNTER+"" +
             RANDOM_TRANSPORTER_COMPANY + RANDOM_BROKER + bodyText;
 
+        // certificate
+        String ownCer = sigManager.getOwnCer(RANDOM_BROKER);
+        
         // Sign
         String signatureText = sigManager.sign(RANDOM_BROKER, textToSign);
 
@@ -110,12 +116,15 @@ public abstract class AbstractHandlerTest {
         SOAPHeaderElement destinationElement = sh.addHeaderElement(destination);
         Name sender = se.createName(SENDER_HEADER, PREFIX, REQUEST_NS);
         SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
+        Name senderCer = se.createName(SENDERCER_HEADER, PREFIX, REQUEST_NS);
+        SOAPHeaderElement senderCerElement = sh.addHeaderElement(senderCer);
         Name name = se.createName(SIGN_HEADER, PREFIX, REQUEST_NS);
         SOAPHeaderElement element = sh.addHeaderElement(name);
 
         counterElement.addTextNode(RANDOM_COUNTER+"");
         destinationElement.addTextNode(RANDOM_TRANSPORTER_COMPANY);
         senderElement.addTextNode(RANDOM_BROKER);
+        senderCerElement.addTextNode(ownCer);
         element.addTextNode(signatureText);
 
         return m;

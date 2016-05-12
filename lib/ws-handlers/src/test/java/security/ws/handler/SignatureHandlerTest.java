@@ -35,6 +35,8 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         @Mocked final SOAPMessageContext smc)
         throws Exception {
 
+        System.out.println("1 is clear!");
+
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
 
@@ -44,6 +46,8 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         SignatureHandler.counter = RANDOM_COUNTER;
         SignatureHandler.destination = RANDOM_TRANSPORTER_COMPANY;
 
+        SignatureManager sigManager = new SignatureManager(KEYSTORE_PASSWORD, KEY_PASSWORD, CA_CERT);
+
         // an "expectation block"
         // One or more invocations to mocked types, causing expectations to be recorded.
         new StrictExpectations() {{
@@ -51,6 +55,9 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
             result = soapOutbound;
             
             smc.get(REQUEST_PROPERTY);
+            result = RANDOM_BROKER;
+
+            smc.get(SENDER_PROPERTY);
             result = RANDOM_BROKER;
             
             smc.getMessage();
@@ -101,11 +108,21 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         valueString = element.getValue();
         assertEquals(RANDOM_BROKER, valueString);
 
+        // certificate element
+        name = soapEnvelope.createName(SENDERCER_HEADER, PREFIX, REQUEST_NS);
+        it = soapHeader.getChildElements(name);
+        assertTrue(it.hasNext());
+        // certificate value
+        String ownCer = sigManager.getOwnCer(RANDOM_BROKER);
+        element = (SOAPElement) it.next();
+        valueString = element.getValue();
+        assertEquals(ownCer, valueString);
+
         // signature element (only checks if signature is present)
         name = soapEnvelope.createName(SIGN_HEADER, PREFIX, REQUEST_NS);
         it = soapHeader.getChildElements(name);
         assertTrue(it.hasNext());
-       
+
         /* assert if body is unchanged */
         SOAPBody sbody = soapEnvelope.getBody();
         assertNotNull(sbody);
@@ -117,7 +134,7 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
     public void testCorrectSignatureHeaderInSignatureHandlerOutbound(
         @Mocked final SOAPMessageContext smc)
         throws Exception {
-
+        System.out.println("2 is clear!");
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
 
@@ -136,6 +153,9 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
             result = soapOutbound;
             
             smc.get(REQUEST_PROPERTY);
+            result = RANDOM_BROKER;
+
+            smc.get(SENDER_PROPERTY);
             result = RANDOM_BROKER;
             
             smc.getMessage();
@@ -175,6 +195,8 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         @Mocked final SOAPMessageContext soapMessageContext)
         throws Exception {
 
+        System.out.println("3 is clear!");
+
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
         SOAPMessage m = byteArrayToSOAPMessage(soapText.getBytes());
@@ -209,7 +231,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         // assert that message would proceed normally
         assertTrue(handleResult);
 
-        //soapMessage.writeTo(System.out);
     }
 
 }
