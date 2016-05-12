@@ -27,7 +27,7 @@ public class TransporterPort implements TransporterPortType{
 
 	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
 	public static String TOKEN = "transporter";
-	public static String destinationEndpoint = "http://localhost:8080/broker-ws/endpoint";
+	//public static String destinationEndpoint = "http://localhost:8080/broker-ws/endpoint";
 		
 	@Resource
 	private WebServiceContext webServiceContext;
@@ -39,9 +39,11 @@ public class TransporterPort implements TransporterPortType{
 		String newValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, newValue);
 		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
+		messageContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfT);
+
 		
 		System.out.println("Contador recebido: " + SignatureHandler.counter);
-		SignatureHandler.destination = destinationEndpoint;
+		//SignatureHandler.destination = destinationEndpoint;
 		System.out.println("Destino colocado: " + SignatureHandler.destination);
 
 	}
