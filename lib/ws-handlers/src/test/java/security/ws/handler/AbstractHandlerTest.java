@@ -3,13 +3,19 @@ package security.ws.handler;
 import java.io.ByteArrayInputStream;
 
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import security.ws.signature.SignatureManager;
 
 
 /**
@@ -79,6 +85,40 @@ public abstract class AbstractHandlerTest {
         SOAPPart soapPart = newMsg.getSOAPPart();
         soapPart.setContent(source);
         return newMsg;
+    }
+
+    protected static SOAPMessage signAndAddHeadersToSoapMessage(SOAPMessage m) throws Exception {
+        SignatureManager sigManager = new SignatureManager(KEYSTORE_PASSWORD, KEY_PASSWORD, CA_CERT);
+
+        // get SOAP envelope
+        SOAPEnvelope se = m.getSOAPPart()
+                           .getEnvelope();
+
+        // get body text to sign:
+        String bodyText = se.getBody().getTextContent().toString();
+        String textToSign = RANDOM_COUNTER+"" +
+            RANDOM_TRANSPORTER_COMPANY + RANDOM_BROKER + bodyText;
+
+        // Sign
+        String signatureText = sigManager.sign(RANDOM_BROKER, textToSign);
+
+        // add header elements (name, namespace prefix, namespace)
+        SOAPHeader sh = se.getHeader();
+        Name msgCounter = se.createName(MSGCOUNTER_HEADER, PREFIX, REQUEST_NS);
+        SOAPHeaderElement counterElement = sh.addHeaderElement(msgCounter);
+        Name destination = se.createName(DESTINATION_HEADER, PREFIX, REQUEST_NS);
+        SOAPHeaderElement destinationElement = sh.addHeaderElement(destination);
+        Name sender = se.createName(SENDER_HEADER, PREFIX, REQUEST_NS);
+        SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
+        Name name = se.createName(SIGN_HEADER, PREFIX, REQUEST_NS);
+        SOAPHeaderElement element = sh.addHeaderElement(name);
+
+        counterElement.addTextNode(RANDOM_COUNTER+"");
+        destinationElement.addTextNode(RANDOM_TRANSPORTER_COMPANY);
+        senderElement.addTextNode(RANDOM_BROKER);
+        element.addTextNode(signatureText);
+
+        return m;
     }
 
 

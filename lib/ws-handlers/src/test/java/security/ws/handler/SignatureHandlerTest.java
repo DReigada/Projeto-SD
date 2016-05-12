@@ -170,25 +170,25 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
 
     }
 
-    /*@Test
+    @Test
     public void testSignatureHandlerInbound(
         @Mocked final SOAPMessageContext soapMessageContext)
         throws Exception {
 
         // Preparation code not specific to JMockit, if any.
-        final String soapText = HELLO_SOAP_REQUEST.replace("<SOAP-ENV:Header/>",
-            "<SOAP-ENV:Header>" +
-            "<d:mySignature xmlns:d=\"http://demo\">22</d:mySignature>" +
-            "</SOAP-ENV:Header>");
-        //System.out.println(soapText);
-
-        final SOAPMessage soapMessage = byteArrayToSOAPMessage(soapText.getBytes());
+        final String soapText = HELLO_SOAP_REQUEST;
+        SOAPMessage m = byteArrayToSOAPMessage(soapText.getBytes());
+        final SOAPMessage soapMessage = signAndAddHeadersToSoapMessage(m);
         final Boolean soapOutbound = false;
 
         // TODO: remove print
-        System.out.println("Message: ");
+        System.out.println("IMPORTANT | Message: ");
         soapMessage.writeTo(System.out);
         System.out.println(); // just to add a newline to output
+
+        // set things so the VerifyIDCounter returns true
+        SignatureHandler.counter = 0;
+        SignatureHandler.selfT = RANDOM_TRANSPORTER_COMPANY;
 
         // an "expectation block"
         // One or more invocations to mocked types, causing expectations to be recorded.
@@ -198,9 +198,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
 
             soapMessageContext.getMessage();
             result = soapMessage;
-
-            soapMessageContext.put(SignatureHandler.CONTEXT_PROPERTY, 22);
-            soapMessageContext.setScope(SignatureHandler.CONTEXT_PROPERTY, Scope.APPLICATION);
         }};
 
         // Unit under test is exercised.
@@ -213,6 +210,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         assertTrue(handleResult);
 
         //soapMessage.writeTo(System.out);
-    }*/
+    }
 
 }
