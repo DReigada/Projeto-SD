@@ -10,7 +10,7 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import example.ws.handler.SignatureHandler;
+import security.ws.handler.SignatureHandler;
 import pt.upa.transporter.core.Job;
 import pt.upa.transporter.core.Job.State;
 import pt.upa.transporter.core.Transporter;

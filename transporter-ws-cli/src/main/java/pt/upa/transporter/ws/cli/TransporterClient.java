@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
-import example.ws.handler.SignatureHandler;
+import security.ws.handler.SignatureHandler;
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;

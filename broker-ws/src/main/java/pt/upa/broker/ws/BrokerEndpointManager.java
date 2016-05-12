@@ -2,7 +2,7 @@ package pt.upa.broker.ws;
 
 import javax.xml.ws.Endpoint;
 
-import example.ws.handler.SignatureHandler;
+import security.ws.handler.SignatureHandler;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 
 import javax.xml.registry.JAXRException;
