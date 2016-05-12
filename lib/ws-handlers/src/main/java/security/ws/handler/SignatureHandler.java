@@ -32,6 +32,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	final static String CA_CERT = "keys//ca-certificate.pem.txt";
 
 	public static final String REQUEST_PROPERTY = "my.request.property";
+	public static final String SENDER_PROPERTY = "my.sender.property";
+
 
 	public static final String SIGN_HEADER = "Signature";
 	public static final String REQUEST_NS = "urn:UPA";
@@ -105,6 +107,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 			// get token from request context - sender
 			String origin = (String) smc.get(REQUEST_PROPERTY);
+			String originURL = (String) smc.get(SENDER_PROPERTY);
+
 			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
 			
 			// get public certificate to send to destination via SOAP header
@@ -122,7 +126,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				// get body text to sign:
 				String bodyText = sb.getTextContent().toString();
 				String textToSign = String.valueOf(SignatureHandler.counter) +
-				SignatureHandler.destination + origin + bodyText;
+				SignatureHandler.destination + originURL + bodyText;
 
 				// Sign
 				String signatureText = sigManager.sign(origin, textToSign);
@@ -150,7 +154,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				counterElement.addTextNode(String.valueOf(SignatureHandler.counter));
 				destinationElement.addTextNode(SignatureHandler.destination);
-				senderElement.addTextNode(origin);
+				senderElement.addTextNode(originURL);
 				senderCerElement.addTextNode(ownCer);
 				element.addTextNode(signatureText);
 
@@ -217,6 +221,11 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				Certificate pubCert = sigManager.decodeCer(certificateToDecode);
 				sigManager.verifyAlt(pubCert, headerValue, textToVerify);
 
+				// put sender in destination variable.
+				// in next outbound call, this value will be used to send the message to the right place
+				SignatureHandler.destination = senderElement.getTextContent();
+				
+				
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
 			} catch (Exception e) {

@@ -47,7 +47,10 @@ public class TransporterClient implements TransporterPortType{
 		String initialValue = TOKEN;
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);
 		requestContext.put(SignatureHandler.REQUEST_PROPERTY, initialValue);
-  
+		requestContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfB);
+
+		
+		
 		System.out.println("---------------------------");
 		System.out.println("Contador antes: " + SignatureHandler.counter);
 		SignatureHandler.counter++;
