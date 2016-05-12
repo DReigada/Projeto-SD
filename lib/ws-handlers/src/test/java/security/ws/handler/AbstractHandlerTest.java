@@ -54,6 +54,10 @@ public abstract class AbstractHandlerTest {
         }
     }
     
+    protected final static String KEYSTORE_PASSWORD = "ins3cur3";
+    protected final static String KEY_PASSWORD = "1nsecure";
+    protected final static String CA_CERT = "keys//ca-certificate.pem.txt";
+
     protected static final String RANDOM_BROKER = "Brokerxyz";
     protected static final String RANDOM_TRANSPORTER_COMPANY = "Transporterxyz";
     protected static final int RANDOM_COUNTER = 33231;

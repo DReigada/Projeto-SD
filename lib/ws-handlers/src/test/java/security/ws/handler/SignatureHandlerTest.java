@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import mockit.Mocked;
 import mockit.StrictExpectations;
+import security.ws.signature.SignatureManager;
 
 
 /**
@@ -36,7 +37,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
 
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
-        // System.out.println(soapText);
 
         final SOAPMessage soapMessage = byteArrayToSOAPMessage(soapText.getBytes());
         final Boolean soapOutbound = true;
@@ -81,7 +81,7 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         // counter value
         SOAPElement element = (SOAPElement) it.next();
         String valueString = element.getValue();
-        assertEquals(RANDOM_COUNTER + "", valueString);
+        assertEquals(RANDOM_COUNTER+"", valueString);
         
         // destination element
         name = soapEnvelope.createName(DESTINATION_HEADER, PREFIX, REQUEST_NS);
@@ -102,7 +102,7 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         assertEquals(RANDOM_BROKER, valueString);
 
         // signature element (only checks if signature is present)
-        name = soapEnvelope.createName(SIGN_HEADER, "e", REQUEST_NS);
+        name = soapEnvelope.createName(SIGN_HEADER, PREFIX, REQUEST_NS);
         it = soapHeader.getChildElements(name);
         assertTrue(it.hasNext());
        
@@ -111,6 +111,63 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         assertNotNull(sbody);
         String bodyText = sbody.getTextContent().toString();
         assertEquals(BODY_TEXT, bodyText);
+    }
+
+    @Test
+    public void testCorrectSignatureHeaderInSignatureHandlerOutbound(
+        @Mocked final SOAPMessageContext smc)
+        throws Exception {
+
+        // Preparation code not specific to JMockit, if any.
+        final String soapText = HELLO_SOAP_REQUEST;
+
+        final SOAPMessage soapMessage = byteArrayToSOAPMessage(soapText.getBytes());
+        final Boolean soapOutbound = true;
+
+        SignatureHandler.counter = RANDOM_COUNTER;
+        SignatureHandler.destination = RANDOM_TRANSPORTER_COMPANY;
+
+        SignatureManager sigManager = new SignatureManager(KEYSTORE_PASSWORD, KEY_PASSWORD, CA_CERT);
+
+        // an "expectation block"
+        // One or more invocations to mocked types, causing expectations to be recorded.
+        new StrictExpectations() {{
+            smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            result = soapOutbound;
+            
+            smc.get(REQUEST_PROPERTY);
+            result = RANDOM_BROKER;
+            
+            smc.getMessage();
+            result = soapMessage;
+            
+        }};
+
+        // Unit under test is exercised.
+        SignatureHandler handler = new SignatureHandler();
+        boolean handleResult = handler.handleMessage(smc);
+
+        // Additional verification code, if any, either here or before the verification block.
+
+        // assert that message would proceed normally
+        assertTrue(handleResult);
+        
+        /* Assert Signature */
+        SOAPPart soapPart = soapMessage.getSOAPPart();
+        SOAPEnvelope soapEnvelope = soapPart.getEnvelope();
+        SOAPHeader soapHeader = soapEnvelope.getHeader();
+
+        // get signature element
+        Name name = soapEnvelope.createName(SIGN_HEADER, PREFIX, REQUEST_NS);
+        SOAPElement ele = (SOAPElement) soapHeader.getChildElements(name).next();
+        String signature = ele.getValue();
+
+        //create string to compare
+        String textToVerify = RANDOM_COUNTER+"" + RANDOM_TRANSPORTER_COMPANY +
+                RANDOM_BROKER + BODY_TEXT;
+        // finally verify signature
+        assertTrue(sigManager.verify(RANDOM_BROKER, signature, textToVerify));
+
     }
 
     /*@Test
