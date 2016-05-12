@@ -8,8 +8,8 @@
         <handler>
             <handler-class>security.ws.handler.SignatureHandler</handler-class>
         </handler>
-        <!--handler>
-            <handler-class>security.ws.handler.LoggingHandler</handler-class>
-        </handler-->
+        <handler>
+            <handler-class>debug.ws.handler.LoggingHandler</handler-class>
+        </handler>
     </handler-chain>
 </handler-chains>
