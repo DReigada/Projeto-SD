@@ -7,13 +7,15 @@ import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
-import security.ws.handler.SignatureHandler;
+import com.sun.xml.ws.streaming.XMLStreamReaderException;
+
 import pt.upa.transporter.ws.BadJobFault_Exception;
 import pt.upa.transporter.ws.BadLocationFault_Exception;
 import pt.upa.transporter.ws.BadPriceFault_Exception;
 import pt.upa.transporter.ws.JobView;
 import pt.upa.transporter.ws.TransporterPortType;
 import pt.upa.transporter.ws.TransporterService;
+import security.ws.handler.SignatureHandler;
 
 public class TransporterClient implements TransporterPortType{
 	
@@ -62,14 +64,22 @@ public class TransporterClient implements TransporterPortType{
 	public String ping(String name) {
 		
 		handle();
-		return _port.ping(name);
+		try{
+			return _port.ping(name);
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
 	public JobView requestJob(String origin, String destination, int price)
 			throws BadLocationFault_Exception, BadPriceFault_Exception {
 		handle();
-		return _port.requestJob(origin, destination, price);
+		try{
+			return _port.requestJob(origin, destination, price);
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
@@ -81,22 +91,31 @@ public class TransporterClient implements TransporterPortType{
 	@Override
 	public JobView jobStatus(String id) {
 		handle();
-		return _port.jobStatus(id);
+		try{
+			return _port.jobStatus(id);
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
 	public List<JobView> listJobs() {
 		handle();
-		return _port.listJobs();
+		try{
+			return _port.listJobs();
+		} catch(XMLStreamReaderException e){
+			return null;
+		}
 	}
 
 	@Override
 	public void clearJobs() {
 		handle();
-		_port.clearJobs();
+		try{
+			_port.clearJobs();
+		} catch(XMLStreamReaderException e){
+			return;
+		}
 	}
-
-	
-
 	
 }
