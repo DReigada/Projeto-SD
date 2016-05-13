@@ -47,7 +47,15 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 
 	public static final String CLASS_NAME = SignatureHandler.class.getSimpleName();
-
+	
+	
+	private boolean _verbose = false;
+	
+	public SignatureHandler() {
+		_verbose = System.getProperty("verbose") != null;
+	}
+	
+	
 	public boolean handleMessage(SOAPMessageContext smc) {
 		return handleAll(smc);
 	}
@@ -111,7 +119,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 			String originURL = (String) smc.get(SENDER_PROPERTY);
 			int isTest = (Integer) smc.get(IS_TEST_PROPERTY); /* TODO: REMOVE FOR PRODUCTION */
 
-			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
+			if(_verbose)
+				System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
 			
 			// get public certificate to send to destination via SOAP header
 			// ready to go
@@ -162,8 +171,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				AttackSimulationHelper attackHelper = new AttackSimulationHelper(isTest, msg); /* TODO: REMOVE FOR PRODUCTION */
 				attackHelper.attack(); /* TODO: REMOVE FOR PRODUCTION */
-
-				System.out.printf("%s put signature '%s' on request message header%n", CLASS_NAME, signatureText);
+				
+				if(_verbose)
+					System.out.printf("%s put signature '%s' on request message header%n", CLASS_NAME, signatureText);
 
 				return true;
 
@@ -191,7 +201,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// check header 
 				if (sh == null) {
-					System.out.println("Header not found.");
+					if(_verbose)
+						System.out.println("Header not found.");
 					return false;
 				}
 
@@ -209,12 +220,16 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				
 				// check counter and destination validity
 				if (verifyIDCounter(destinationElement.getTextContent(), Integer.parseInt(counterElement.getTextContent()))) {
-					System.out.println("-----------------------");
-					System.out.println("Message valid.");
+					if(_verbose){
+						System.out.println("-----------------------");
+						System.out.println("Message valid.");
+					}
 					SignatureHandler.counter = Integer.parseInt(counterElement.getTextContent());
 				} else {
-					System.out.println("-----------------------");
-					System.out.println("Message NOT valid.");
+					if(_verbose){
+						System.out.println("-----------------------");
+						System.out.println("Message NOT valid.");
+					}
 					return false;
 				}
 
