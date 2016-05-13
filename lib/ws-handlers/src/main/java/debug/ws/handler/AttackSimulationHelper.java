@@ -51,6 +51,9 @@ public class AttackSimulationHelper {
 		    case 4 :
 		    	alterDestinationAttack();
 		    	break;
+		    case 5 :
+		    	alterSenderAttack();
+		    	break;
 		}
 		
 	}
@@ -135,6 +138,27 @@ public class AttackSimulationHelper {
 	    System.out.println("The old message:\n" + bodyText + "\n--------");
 	    
 	    Node signatureHeader = element.getElementsByTagName("e:" + SignatureHandler.DESTINATION_HEADER).item(0);
+	    byte[] bytes = signatureHeader.getTextContent().getBytes();
+	    bytes[0] = '*';
+	    signatureHeader.setTextContent(new String(bytes));
+	    _message.saveChanges();
+	    
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    _message.writeTo(out);
+	    String newMessage = new String(out.toByteArray());
+	    
+	    System.out.println("The new message:\n" + newMessage + "\n--------");	
+    }
+    
+    private void alterSenderAttack() throws Exception{
+		SOAPHeader element = _message.getSOAPHeader();
+	    DOMSource source = new DOMSource(element);
+	    StringWriter stringResult = new StringWriter();
+	    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
+	    String bodyText = stringResult.toString();
+	    System.out.println("The old message:\n" + bodyText + "\n--------");
+	    
+	    Node signatureHeader = element.getElementsByTagName("e:" + SignatureHandler.SENDER_HEADER).item(0);
 	    byte[] bytes = signatureHeader.getTextContent().getBytes();
 	    bytes[0] = '*';
 	    signatureHeader.setTextContent(new String(bytes));
