@@ -139,19 +139,19 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 					sh = se.addHeader();
 
 				// add header elements (name, namespace prefix, namespace)
-				Name msgCounter = se.createName(MSGCOUNTER_HEADER, "e", REQUEST_NS);
+				Name msgCounter = se.createName(MSGCOUNTER_HEADER, PREFIX, REQUEST_NS);
 				SOAPHeaderElement counterElement = sh.addHeaderElement(msgCounter);
 
-				Name destination = se.createName(DESTINATION_HEADER, "e", REQUEST_NS);
+				Name destination = se.createName(DESTINATION_HEADER, PREFIX, REQUEST_NS);
 				SOAPHeaderElement destinationElement = sh.addHeaderElement(destination);
 
-				Name sender = se.createName(SENDER_HEADER, "e", REQUEST_NS);
+				Name sender = se.createName(SENDER_HEADER, PREFIX, REQUEST_NS);
 				SOAPHeaderElement senderElement = sh.addHeaderElement(sender);
 				
-				Name senderCer = se.createName(SENDERCER_HEADER, "e", REQUEST_NS);
+				Name senderCer = se.createName(SENDERCER_HEADER, PREFIX, REQUEST_NS);
 				SOAPHeaderElement senderCerElement = sh.addHeaderElement(senderCer);
 
-				Name name = se.createName(SIGN_HEADER, "e", REQUEST_NS);
+				Name name = se.createName(SIGN_HEADER, PREFIX, REQUEST_NS);
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 				counterElement.addTextNode(String.valueOf(SignatureHandler.counter));
