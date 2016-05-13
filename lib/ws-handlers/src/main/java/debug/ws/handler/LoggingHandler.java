@@ -18,12 +18,14 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        if(System.getProperty("verbose") != null)
+        	logToSystemOut(smc);
         return true;
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        if(System.getProperty("verbose") != null)
+        	logToSystemOut(smc);
         return true;
     }
 
