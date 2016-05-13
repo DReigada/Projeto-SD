@@ -71,7 +71,7 @@ public class RequestJobPriceAttackIT extends BaseIT {
     	String  city1 = "Lisboa",
     			city2 = "Coimbra";
 
-    	transporter1.setIsTest(5);
+    	transporter1.setIsTest(6);
     	JobView job = transporter1.requestJob(city1, city2, 50);
     	assertNull(job);
     }
