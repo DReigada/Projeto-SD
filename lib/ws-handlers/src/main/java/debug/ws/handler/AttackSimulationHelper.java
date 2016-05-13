@@ -54,6 +54,9 @@ public class AttackSimulationHelper {
 		    case 5 :
 		    	alterSenderAttack();
 		    	break;
+		    case 6 :
+		    	alterCertificate();
+		    	break;
 		}
 		
 	}
@@ -169,6 +172,27 @@ public class AttackSimulationHelper {
 	    String newMessage = new String(out.toByteArray());
 	    
 	    System.out.println("The new message:\n" + newMessage + "\n--------");	
+    }
+    
+    private void alterCertificate() throws Exception{
+		SOAPHeader element = _message.getSOAPHeader();
+	    DOMSource source = new DOMSource(element);
+	    StringWriter stringResult = new StringWriter();
+	    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
+	    String bodyText = stringResult.toString();
+	    System.out.println("The old message:\n" + bodyText + "\n--------");
+	    
+	    Node signatureHeader = element.getElementsByTagName("e:" + SignatureHandler.SENDERCER_HEADER).item(0);
+	    byte[] bytes = signatureHeader.getTextContent().getBytes();
+	    bytes[0] = '*';
+	    signatureHeader.setTextContent(new String(bytes));
+	    _message.saveChanges();
+	    
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    _message.writeTo(out);
+	    String newMessage = new String(out.toByteArray());
+	    
+	    System.out.println("The new message:\n" + newMessage + "\n--------");
     }
 
 }	
