@@ -5,6 +5,7 @@ import java.io.StringWriter;
 
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.transform.TransformerFactory;
@@ -12,6 +13,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Node;
+
+import security.ws.handler.SignatureHandler;
 
 /**
  * This class should be removed for production.
@@ -51,7 +54,7 @@ public class AttackSimulationHelper {
 	    StringWriter stringResult = new StringWriter();
 	    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
 	    String bodyText = stringResult.toString();
-	    System.out.println("The old message:\n" + bodyText + "%n--------");
+	    System.out.println("The old message:\n" + bodyText + "\n--------");
 	    
 	    Node priceTag = element.getElementsByTagName("price").item(0);
 	    
@@ -68,9 +71,10 @@ public class AttackSimulationHelper {
 	    _message.writeTo(out);
 	    String newMessage = new String(out.toByteArray());
 	    
-	    System.out.println("The new message:\n" + newMessage + "%n--------");
-  }
-
+	    System.out.println("The new message:\n" + newMessage + "\n--------");
+	}
+	
+	
 	private void alterSignatureAttack(){}
 	private void alterCounterValueAttack(){}
 }	
