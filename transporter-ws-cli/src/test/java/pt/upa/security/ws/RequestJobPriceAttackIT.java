@@ -35,4 +35,14 @@ public class RequestJobPriceAttackIT extends BaseIT {
     	JobView job = transporter1.requestJob(city1, city2, 50);
     	assertNull(job);
     }   
+    
+    @Test
+    public void testChangeCounter() throws Exception{
+    	String  city1 = "Lisboa",
+    			city2 = "Coimbra";
+
+    	transporter1.setIsTest(3);
+    	JobView job = transporter1.requestJob(city1, city2, 50);
+    	assertNull(job);
+    } 
 } 

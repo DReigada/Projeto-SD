@@ -5,10 +5,14 @@ import java.io.StringWriter;
 
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -96,6 +100,26 @@ public class AttackSimulationHelper {
 	    System.out.println("The new message:\n" + newMessage + "\n--------");
 		
 	}
-	private void alterCounterValueAttack(){}
+	
+	private void alterCounterValueAttack() throws Exception{	
+		SOAPHeader element = _message.getSOAPHeader();
+	    DOMSource source = new DOMSource(element);
+	    StringWriter stringResult = new StringWriter();
+	    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
+	    String bodyText = stringResult.toString();
+	    System.out.println("The old message:\n" + bodyText + "\n--------");
+	    
+	    Node signatureHeader = element.getElementsByTagName("e:" + SignatureHandler.MSGCOUNTER_HEADER).item(0);
+	    byte[] bytes = signatureHeader.getTextContent().getBytes();
+	    bytes[0] = '*';
+	    signatureHeader.setTextContent(new String(bytes));
+	    _message.saveChanges();
+	    
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    _message.writeTo(out);
+	    String newMessage = new String(out.toByteArray());
+	    
+	    System.out.println("The new message:\n" + newMessage + "\n--------");
+	}
 }	
 
