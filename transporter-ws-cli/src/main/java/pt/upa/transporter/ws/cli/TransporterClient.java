@@ -52,24 +52,14 @@ public class TransporterClient implements TransporterPortType{
         		
         // put token UpaBroker in request context
 		String initialValue = TOKEN;
-		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);
 		requestContext.put(SignatureHandler.REQUEST_PROPERTY, initialValue);
 		requestContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfB);
 		requestContext.put(SignatureHandler.IS_TEST_PROPERTY, _isTest); /* TODO: REMOVE FOR PRODUCTION */
 
-		
-		
-		System.out.println("---------------------------");
-		System.out.println("Contador antes: " + SignatureHandler.counter);
 		SignatureHandler.counter++;
 		_counterBackup.updateMessageCounter(SignatureHandler.counter); //update the counter on the backup
-		System.out.println("Contador depois: " + SignatureHandler.counter);
-		System.out.println("---------------------------");
-		
+
 		SignatureHandler.destination = destination;
-		System.out.println("---------------------------");
-		System.out.println("Destino: " + SignatureHandler.destination);
-		
 	}
 	
 	@Override

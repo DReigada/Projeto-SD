@@ -18,12 +18,14 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        if(System.getProperty("verbose") != null)
+        	logToSystemOut(smc);
         return true;
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        if(System.getProperty("verbose") != null)
+        	logToSystemOut(smc);
         return true;
     }
 
@@ -40,7 +42,7 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
     private void logToSystemOut(SOAPMessageContext smc) {
         Boolean outbound = (Boolean) smc
                 .get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-
+        
         if (outbound) {
             System.out.println("Outbound SOAP message:");
         } else {
@@ -49,6 +51,7 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
         SOAPMessage message = smc.getMessage();
         try {
+        	message.saveChanges();
             message.writeTo(System.out);
             System.out.println(); // just to add a newline to output
         } catch (Exception e) {
