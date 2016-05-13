@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.xml.ws.BindingProvider;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
-import pt.upa.transporter.ws.JobView;
 import pt.upa.transporter.ws.TransporterPortType;
 import pt.upa.transporter.ws.TransporterService;
 
@@ -71,16 +70,5 @@ public class TransporterClientApplication {
 			System.exit(-1);
 		}
 		
-	}
-	private static void printViewInfo(JobView view) {
-		System.out.println("----------------------------------");
-		System.out.println("Transport ID: " + view.getJobIdentifier());
-		System.out.println("Origin: " + view.getJobOrigin());
-		System.out.println("Destination: " + view.getJobDestination());
-		System.out.println("Price: " + view.getJobPrice());
-		System.out.println("Transporter Company: " + view.getCompanyName());
-		System.out.println("State: " + view.getJobState().name());
-		System.out.println("----------------------------------");
-		System.out.println();
 	}
 }
