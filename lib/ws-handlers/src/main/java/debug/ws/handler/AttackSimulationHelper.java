@@ -46,31 +46,29 @@ public class AttackSimulationHelper {
 	}
 
 	private void increasePriceAttack() throws Exception{
-		SOAPPart sp = _message.getSOAPPart();
-		SOAPEnvelope se = sp.getEnvelope();
-		SOAPBody element = se.getBody();
-    DOMSource source = new DOMSource(element);
-    StringWriter stringResult = new StringWriter();
-    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
-    String bodyText = stringResult.toString();
-    System.out.println("The old message:\n" + bodyText + "%n--------");
-    
-    Node priceTag = element.getElementsByTagName("price").item(0);
-    
-    int price = Integer.parseInt(priceTag.getTextContent());
-    System.out.println("OLD PRICE: " + price);
-    
-    priceTag.setTextContent("90");
-    _message.saveChanges();
-    
-    price = Integer.parseInt(priceTag.getTextContent());
-    System.out.println("NEW PRICE: " + price);
-    
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    _message.writeTo(out);
-    String newMessage = new String(out.toByteArray());
-    
-    System.out.println("The new message:\n" + newMessage + "%n--------");
+		SOAPBody element = _message.getSOAPBody();
+	    DOMSource source = new DOMSource(element);
+	    StringWriter stringResult = new StringWriter();
+	    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
+	    String bodyText = stringResult.toString();
+	    System.out.println("The old message:\n" + bodyText + "%n--------");
+	    
+	    Node priceTag = element.getElementsByTagName("price").item(0);
+	    
+	    int price = Integer.parseInt(priceTag.getTextContent());
+	    System.out.println("OLD PRICE: " + price);
+	    
+	    priceTag.setTextContent("90");
+	    _message.saveChanges();
+	    
+	    price = Integer.parseInt(priceTag.getTextContent());
+	    System.out.println("NEW PRICE: " + price);
+	    
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    _message.writeTo(out);
+	    String newMessage = new String(out.toByteArray());
+	    
+	    System.out.println("The new message:\n" + newMessage + "%n--------");
   }
 
 	private void alterSignatureAttack(){}
