@@ -35,8 +35,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
         @Mocked final SOAPMessageContext smc)
         throws Exception {
 
-        System.out.println("1 is clear!");
-
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
 
@@ -137,7 +135,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
     public void testCorrectSignatureHeaderInSignatureHandlerOutbound(
         @Mocked final SOAPMessageContext smc)
         throws Exception {
-        System.out.println("2 is clear!");
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
 
@@ -200,8 +197,6 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
     public void testSignatureHandlerInbound(
         @Mocked final SOAPMessageContext soapMessageContext)
         throws Exception {
-
-        System.out.println("3 is clear!");
 
         // Preparation code not specific to JMockit, if any.
         final String soapText = HELLO_SOAP_REQUEST;
