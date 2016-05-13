@@ -59,6 +59,9 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
 
             smc.get(SENDER_PROPERTY);
             result = RANDOM_BROKER;
+
+            smc.get(IS_TEST_PROPERTY);
+            result = 0;
             
             smc.getMessage();
             result = soapMessage;
@@ -157,6 +160,9 @@ public class SignatureHandlerTest extends AbstractHandlerTest {
 
             smc.get(SENDER_PROPERTY);
             result = RANDOM_BROKER;
+
+            smc.get(IS_TEST_PROPERTY);
+            result = 0;
             
             smc.getMessage();
             result = soapMessage;

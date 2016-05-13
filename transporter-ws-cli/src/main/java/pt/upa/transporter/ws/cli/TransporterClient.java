@@ -22,12 +22,14 @@ public class TransporterClient implements TransporterPortType{
 	public static final String CLASS_NAME = TransporterClient.class.getSimpleName();
 	public static final String TOKEN = "UpaBroker";
 	
-	TransporterPortType _port;
-	BindingProvider bindingProvider;
-	Map<String, Object> requestContext;
+	private TransporterPortType _port;
+	private BindingProvider bindingProvider;
+	private Map<String, Object> requestContext;
 	
-	String destination;
+	private String destination;
 	private CounterBackup _counterBackup;
+
+	private int _isTest; /* TODO: REMOVE FOR PRODUCTION */
 	
 	public TransporterClient(String endpointURL, CounterBackup counterBackup) {
         // get new port
@@ -40,8 +42,12 @@ public class TransporterClient implements TransporterPortType{
 
         destination = endpointURL;
         _counterBackup = counterBackup;
+
+        _isTest = 0; /* TODO: REMOVE FOR PRODUCTION */
 	}
 	
+	public void setIsTest(int v) {_isTest=v;} /* TODO: REMOVE FOR PRODUCTION */
+
 	public void handle() {
         		
         // put token UpaBroker in request context
@@ -49,6 +55,7 @@ public class TransporterClient implements TransporterPortType{
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, initialValue);
 		requestContext.put(SignatureHandler.REQUEST_PROPERTY, initialValue);
 		requestContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfB);
+		requestContext.put(SignatureHandler.IS_TEST_PROPERTY, _isTest); /* TODO: REMOVE FOR PRODUCTION */
 
 		
 		
