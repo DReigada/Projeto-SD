@@ -57,19 +57,10 @@ public class TransporterClient implements TransporterPortType{
 		requestContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfB);
 		requestContext.put(SignatureHandler.IS_TEST_PROPERTY, _isTest); /* TODO: REMOVE FOR PRODUCTION */
 
-		
-		
-		System.out.println("---------------------------");
-		System.out.println("Contador antes: " + SignatureHandler.counter);
 		SignatureHandler.counter++;
 		_counterBackup.updateMessageCounter(SignatureHandler.counter); //update the counter on the backup
-		System.out.println("Contador depois: " + SignatureHandler.counter);
-		System.out.println("---------------------------");
-		
+
 		SignatureHandler.destination = destination;
-		System.out.println("---------------------------");
-		System.out.println("Destino: " + SignatureHandler.destination);
-		
 	}
 	
 	@Override
