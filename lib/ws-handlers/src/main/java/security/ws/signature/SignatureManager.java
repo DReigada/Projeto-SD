@@ -17,11 +17,13 @@ public class SignatureManager {
 	private String _keystorePassword;
 	private String _keyPassword;
 	private String _caCert;
+	private boolean _verbose;
 	
 	public SignatureManager(String keystorePass, String keyPass, String caCert) {
 		_keystorePassword = keystorePass;
 		_keyPassword = keyPass;
 		_caCert = caCert;
+		_verbose = System.getProperty("verbose") != null;
 	}
 	
 	public String getOwnCer (String orig) throws Exception {
@@ -79,9 +81,11 @@ public class SignatureManager {
 
 		// check if the certificate is valid (signed by CA)
 		if (caCheck.verifySignedCertificate(certificate,caPublicKey)) {
-			System.out.println("The signed certificate is valid");
+			if(_verbose)
+				System.out.println("The signed certificate is valid");
 		} else {
-			System.err.println("The signed certificate is not valid");
+			if(_verbose)
+				System.err.println("The signed certificate is not valid");
 			return false;
 		}				
 
@@ -89,16 +93,19 @@ public class SignatureManager {
 		PublicKey publicKey = certificate.getPublicKey();
 
 		// verify the signature
-		System.out.println("Verifying ...");
+		if(_verbose)
+			System.out.println("Verifying ...");
 		byte[] bytesToVerify = text2verify.getBytes();
 
 		boolean isValid = Sign.verifyDigitalSignature(signatureBytes, bytesToVerify, publicKey);
 
 		if (isValid) {
-			System.out.println("The digital signature is valid");
+			if(_verbose)
+				System.out.println("The digital signature is valid");
 			return true;
 		} else {
-			System.out.println("The digital signature is NOT valid");
+			if(_verbose)
+				System.out.println("The digital signature is NOT valid");
 			return false;
 		}
 
@@ -118,9 +125,11 @@ public class SignatureManager {
 
 		// check if the certificate is valid (signed by CA)
 		if (caCheck.verifySignedCertificate(certificate,caPublicKey)) {
-			System.out.println("Alt: The signed certificate is valid");
+			if(_verbose)
+				System.out.println("Alt: The signed certificate is valid");
 		} else {
-			System.err.println("The signed certificate is not valid");
+			if(_verbose)
+				System.err.println("The signed certificate is not valid");
 			return false;
 		}				
 
@@ -128,16 +137,19 @@ public class SignatureManager {
 		PublicKey publicKey = certificate.getPublicKey();
 
 		// verify the signature
-		System.out.println("Verifying ...");
+		if(_verbose)
+			System.out.println("Verifying ...");
 		byte[] bytesToVerify = text2verify.getBytes();
 				
 		boolean isValid = Sign.verifyDigitalSignature(signatureBytes, bytesToVerify, publicKey);
 
 		if (isValid) {
-			System.out.println("The digital signature is valid");
+			if(_verbose)
+				System.out.println("The digital signature is valid");
 			return true;
 		} else {
-			System.out.println("The digital signature is NOT valid");
+			if(_verbose)
+				System.out.println("The digital signature is NOT valid");
 			return false;
 		}
 
