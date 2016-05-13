@@ -4,8 +4,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
+import security.ws.handler.SignatureHandler;
 import pt.upa.transporter.core.Job;
 import pt.upa.transporter.core.Job.State;
 import pt.upa.transporter.core.Transporter;
@@ -14,31 +19,54 @@ import pt.upa.transporter.core.Exceptions.BadPriceException;
 import pt.upa.transporter.simulator.JobStateSimulator;
 
 @WebService(
-	    endpointInterface="pt.upa.transporter.ws.TransporterPortType"
-	)
+		endpointInterface="pt.upa.transporter.ws.TransporterPortType"
+		)
+@HandlerChain(file = "/transporter-handler-chain.xml")
 public class TransporterPort implements TransporterPortType{
-	
+
+
+	public static final String CLASS_NAME = TransporterPort.class.getSimpleName();
+	public static String TOKEN = "transporter";
+		
+	@Resource
+	private WebServiceContext webServiceContext;
+
+	public void handle() {
+		if(webServiceContext == null) return;
+		MessageContext messageContext = webServiceContext.getMessageContext();
+
+		TOKEN = _transporter.getName();
+		String newValue = TOKEN;
+		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
+		messageContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfT);
+		messageContext.put(SignatureHandler.IS_TEST_PROPERTY, 0); /* TODO: REMOVE FOR PRODUCTION (the 0 indicates that its never a test) */
+
+	}
+
 	Transporter _transporter;
 	public JobStateSimulator _jobSimulator;
-	
+
 	public TransporterPort(Transporter transporter) {
 		_transporter = transporter;
 		_jobSimulator = new JobStateSimulator();
+
 	}
-	
+
 	/**
 	 * @param name 
 	 * @return a diagnosis message
 	 */
 	@Override
 	public String ping(String name) {
+		handle();
 		return "Received message: " + name;
 	}
-	
+
 	@Override
 	public JobView requestJob(String origin, String destination, int price)
 			throws BadLocationFault_Exception, BadPriceFault_Exception {
 		try{
+			handle();
 			Job newJob = _transporter.requestJob(origin, destination, price);
 			if(newJob == null) return null;
 			return newJob.getView();
@@ -53,8 +81,9 @@ public class TransporterPort implements TransporterPortType{
 			fault.setLocation(e.getLocation());
 			throw new BadLocationFault_Exception(e.getMessage(), fault);
 		}
+
 	}
-	
+
 	/**
 	 * Changes the state of the job based if it was accepted or not 
 	 * @param id the id of the job
@@ -64,6 +93,7 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	@Override
 	public JobView decideJob(String id, boolean accept) throws BadJobFault_Exception {
+		handle();
 		Job job = _transporter.getJobById(id);
 		if (job == null){
 			BadJobFault fault = new BadJobFault();
@@ -76,7 +106,7 @@ public class TransporterPort implements TransporterPortType{
 		}
 		return job.getView();
 	}
-	
+
 	/**
 	 * Gets the job based with the given ID 
 	 * @param id the id of the job
@@ -84,6 +114,7 @@ public class TransporterPort implements TransporterPortType{
 	 */
 	@Override
 	public JobView jobStatus(String id) {
+		handle();
 		Job job = _transporter.getJobById(id);
 		if(job == null) return null;
 		return job.getView();
@@ -91,21 +122,24 @@ public class TransporterPort implements TransporterPortType{
 
 	@Override
 	public List<JobView> listJobs() {
-	  Collection<Job> jobs = _transporter.getAllJobs();
-	  List<JobView> views = jobs.stream().map(Job -> Job.getView()).collect(Collectors.toList());
+		handle();
+		Collection<Job> jobs = _transporter.getAllJobs();
+		List<JobView> views = jobs.stream().map(Job -> Job.getView()).collect(Collectors.toList());
 
-	  return views;
+		return views;
 	}
 
 	@Override
 	public void clearJobs() {
+		handle();
 		_transporter.deleteAllJobs();
 	}
-	
+
 	/**
 	 * Stops the job simulator
 	 */
 	void stopSimulator(){
+		//handle();
 		_jobSimulator.stop();
 	}
 }

@@ -1,0 +1,13 @@
+<handler-chains xmlns="http://java.sun.com/xml/ns/javaee">
+	<handler-chain>
+        <!-- >handler>
+            <handler-class>example.ws.handler.RelayServerHandler</handler-class>
+        </handler-->
+        <handler>
+            <handler-class>security.ws.handler.SignatureHandler</handler-class>
+        </handler>
+		<handler>
+			<handler-class>debug.ws.handler.LoggingHandler</handler-class>
+		</handler>
+	</handler-chain>
+</handler-chains>   

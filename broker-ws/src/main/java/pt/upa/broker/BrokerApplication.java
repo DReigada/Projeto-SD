@@ -1,6 +1,6 @@
 package pt.upa.broker;
 
-import pt.upa.broker.ws.BrokerEndpointManager;
+import pt.upa.broker.ws.Broker;
 
 public class BrokerApplication {
 
@@ -8,28 +8,26 @@ public class BrokerApplication {
 		System.out.println(BrokerApplication.class.getSimpleName() + " starting...");
 
     // Check arguments
-    if (args.length < 3) {
+    if (args.length < 4) {
       System.err.println("Argument(s) missing!");
-      System.err.printf("Usage: java %s uddiURL wsName wsURL%n", BrokerApplication.class.getName());
+      System.err.printf("Usage: java %s uddiURL mainName wsURL y/n%n", BrokerApplication.class.getName());
       return;
     }
 
     String uddiURL = args[0];
     String name = args[1];
     String url = args[2];
-
-    BrokerEndpointManager brokerEndPointManager = new BrokerEndpointManager(uddiURL);
+    String backup = args[3];
+    
+    boolean isBackup = backup.equals("y") ? true : false;
+  
+    
+    Broker broker = new Broker(uddiURL, name, url, isBackup);
 
     try {
 
-      // publish endpoint
-      System.out.printf("Starting %s%n", url);
-      brokerEndPointManager.start(url);
-
-      // publish to UDDI
-      System.out.printf("Publishing '%s' to UDDI at %s%n", name, uddiURL);
-      brokerEndPointManager.awaitConnections(name);
-
+      broker.start(!isBackup);
+      
       // wait
       System.out.println("Awaiting connections");
       System.out.println("Press enter to shutdown");
@@ -40,7 +38,7 @@ public class BrokerApplication {
       e.printStackTrace();
 
     } finally {
-      brokerEndPointManager.stop();
+      broker.stop();
     }
   }
 }

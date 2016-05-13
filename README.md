@@ -47,8 +47,14 @@ git clone https://github.com/tecnico-softeng-distsys-2015/T_70-project/ .
 
 [4] Instalar módulos de bibliotecas auxiliares
 
+**Uddi-naming:**
 ```
-cd lib/uddi-naming
+cd lib/uddi-naming/
+mvn clean install
+```
+**SOAP handlers:**
+```
+cd lib/ws-handlers/
 mvn clean install
 ```
 
@@ -56,10 +62,10 @@ mvn clean install
 
 ### Serviço TRANSPORTER
 
-[1] Construir e executar testes unitários **servidor**
+[1] Construir e executar testes unitários do **servidor**
 
 ```
-cd transporter-ws
+cd transporter-ws/
 mvn clean compile
 mvn test
 ```
@@ -71,10 +77,10 @@ mvn exec:java -Dws.i=1
 mvn exec:java -Dws.i=2
 ```
 
-[3] Construir, instalar (necessário para o serviço broker) e correr testes de integração **cliente** (em outro terminal)
+[3] Construir, instalar (necessário para o serviço broker) e correr testes de integração do **cliente** (noutro terminal)
 
 ```
-cd ../transporter-ws-cli
+cd transporter-ws-cli/
 mvn clean install
 ```
 
@@ -82,31 +88,42 @@ mvn clean install
 
 ### Serviço BROKER
 
-[1] Construir e executar testes de unitários **servidor** (em outro terminal)
+[1] Construir e executar testes de unitários do **servidor**
 
 ```
-cd broker-ws
+cd broker-ws/
 mvn clean compile
 mvn test
 ```
 
-[2] Executar o **servidor**
+[2] Executar dois **transporters** (como referido no ponto 2 do serviço TRANSPORTER)
 
+```
+mvn exec:java -Dws.i=1
+mvn exec:java -Dws.i=2
+```
+
+[3] Executar o **servidor de backup**
+
+```
+mvn exec:java -P backup-broker
+```
+[4] Esperar que o **servidor de backup** inicie e  executar o **servidor principal** (noutro terminal)
 ```
 mvn exec:java
 ```
 
-[3] Construir **cliente** e executar testes de integração (em outro terminal)
+[5] Construir **cliente** e executar testes de integração (noutro terminal)
 
 ```
-cd ../broker-ws-cli
+cd broker-ws-cli/
 mvn clean compile
 mvn verify
 ```
 
-Nota: Caso queira correr um simples interface de cliente para comunicar com o broker
+Nota: Caso queira correr uma simples interface de cliente para comunicar com o broker
 ```
-cd broker-ws-cli
+cd broker-ws-cli/
 mvn exec:java
 ```
 
