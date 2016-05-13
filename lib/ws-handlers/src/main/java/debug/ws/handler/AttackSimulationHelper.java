@@ -1,10 +1,8 @@
 package debug.ws.handler;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPMessage;
@@ -12,6 +10,8 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Node;
 
 /**
  * This class should be removed for production.
@@ -53,29 +53,24 @@ public class AttackSimulationHelper {
     StringWriter stringResult = new StringWriter();
     TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
     String bodyText = stringResult.toString();
-    System.out.println("The whole body 1:\n" + bodyText + "\n--------");
-
-    // get the price
-    int init = bodyText.indexOf("<price>") + 7;
-    int i = init;
-    while (Character.isDigit(bodyText.charAt(i))) ++i;
-    int price = Integer.parseInt(bodyText.substring(init, i));
-
-    System.out.println("NEW PRICE: " + price);
-
-    String newBody = bodyText.replace(price+"", "99");
-    newBody = newBody.substring(newBody.indexOf("S")-1);
-
-    System.out.println("The whole body 2:\n" + newBody + "\n--------");
-
-    byte[] b = newBody.getBytes(Charset.forName("UTF-8"));
-    ByteArrayInputStream byteInStream = new ByteArrayInputStream(b);
-
-    // modify message
-		MessageFactory factory = MessageFactory.newInstance();
-		SOAPMessage newMessage = factory.createMessage(_message.getMimeHeaders(), byteInStream);
-		_message.getSOAPPart().setContent(newMessage.getSOAPPart().getContent());
+    System.out.println("The old message:\n" + bodyText + "%n--------");
     
+    Node priceTag = element.getElementsByTagName("price").item(0);
+    
+    int price = Integer.parseInt(priceTag.getTextContent());
+    System.out.println("OLD PRICE: " + price);
+    
+    priceTag.setTextContent("90");
+    _message.saveChanges();
+    
+    price = Integer.parseInt(priceTag.getTextContent());
+    System.out.println("NEW PRICE: " + price);
+    
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    _message.writeTo(out);
+    String newMessage = new String(out.toByteArray());
+    
+    System.out.println("The new message:\n" + newMessage + "%n--------");
   }
 
 	private void alterSignatureAttack(){}
