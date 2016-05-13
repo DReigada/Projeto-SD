@@ -33,6 +33,7 @@ public class TransporterPort implements TransporterPortType{
 	private WebServiceContext webServiceContext;
 
 	public void handle() {
+		if(webServiceContext == null) return;
 		MessageContext messageContext = webServiceContext.getMessageContext();
 
 		TOKEN = _transporter.getName();
