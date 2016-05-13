@@ -238,11 +238,13 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				SignatureHandler.destination = senderElement.getTextContent();
 				return true;
 				
+			} catch (NumberFormatException e) {
+				return false;
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
 				System.exit(1);
 			} catch (Exception e) {
-				System.out.printf("Exception caught", e);
+				System.out.printf("Exception caught: %s", e);
 				System.exit(1);
 			}
 
