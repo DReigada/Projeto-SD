@@ -70,7 +70,8 @@ public abstract class AbstractHandlerTest {
 
     protected static final String REQUEST_PROPERTY = "my.request.property";
     protected static final String SENDER_PROPERTY = "my.sender.property";
-
+    protected static final String IS_TEST_PROPERTY = "my.isTest.property"; /* TODO: REMOVE FOR PRODUCTION */
+    
     public static final String REQUEST_NS = "urn:UPA";
     public static final String MSGCOUNTER_HEADER = "MsgCounter";
 	public static final String SENDER_HEADER = "Sender";

@@ -18,6 +18,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import debug.ws.handler.AttackSimulationHelper;
 import security.ws.signature.SignatureManager;
 
 public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
@@ -33,7 +34,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String REQUEST_PROPERTY = "my.request.property";
 	public static final String SENDER_PROPERTY = "my.sender.property";
-
+	public static final String IS_TEST_PROPERTY = "my.isTest.property"; /* TODO: REMOVE FOR PRODUCTION */
 
 	public static final String SIGN_HEADER = "Signature";
 	public static final String REQUEST_NS = "urn:UPA";
@@ -108,6 +109,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 			// get token from request context - sender
 			String origin = (String) smc.get(REQUEST_PROPERTY);
 			String originURL = (String) smc.get(SENDER_PROPERTY);
+			int isTest = (Integer) smc.get(IS_TEST_PROPERTY); /* TODO: REMOVE FOR PRODUCTION */
 
 			System.out.printf("%s received '%s'%n", CLASS_NAME, origin);
 			
@@ -157,6 +159,9 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				senderElement.addTextNode(originURL);
 				senderCerElement.addTextNode(ownCer);
 				element.addTextNode(signatureText);
+
+				AttackSimulationHelper attackHelper = new AttackSimulationHelper(isTest, msg); /* TODO: REMOVE FOR PRODUCTION */
+				attackHelper.attack(); /* TODO: REMOVE FOR PRODUCTION */
 
 				System.out.printf("%s put signature '%s' on request message header%n", CLASS_NAME, signatureText);
 
@@ -233,15 +238,18 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				SignatureHandler.destination = senderElement.getTextContent();
 				return true;
 				
+			} catch (NumberFormatException e) {
+				return false;
 			} catch (SOAPException e) {
 				System.out.printf("Failed to get SOAP header because of %s%n", e);
 				System.exit(1);
 			} catch (Exception e) {
-				System.out.printf("Exception caught", e);
+				System.out.printf("Exception caught: %s", e);
 				System.exit(1);
 			}
 
 		}
 		return false;
 	}
+
 }

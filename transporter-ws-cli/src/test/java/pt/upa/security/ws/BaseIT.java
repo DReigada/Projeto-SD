@@ -1,4 +1,5 @@
-package pt.upa.transporter.ws.it;
+package pt.upa.security.ws;
+
 
 import java.io.IOException;
 import java.util.Properties;
