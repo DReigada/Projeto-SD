@@ -40,6 +40,7 @@ public class TransporterPort implements TransporterPortType{
 		System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, newValue);
 		messageContext.put(SignatureHandler.REQUEST_PROPERTY, newValue);
 		messageContext.put(SignatureHandler.SENDER_PROPERTY, SignatureHandler.selfT);
+		messageContext.put(SignatureHandler.IS_TEST_PROPERTY, 0); /* TODO: REMOVE FOR PRODUCTION (the 0 indicates that its never a test) */
 
 		
 		System.out.println("Contador recebido: " + SignatureHandler.counter);

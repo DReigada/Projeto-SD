@@ -49,27 +49,33 @@ public class AttackSimulationHelper {
 		SOAPPart sp = _message.getSOAPPart();
 		SOAPEnvelope se = sp.getEnvelope();
 		SOAPBody element = se.getBody();
-	    DOMSource source = new DOMSource(element);
-	    StringWriter stringResult = new StringWriter();
-	    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
-	    String bodyText = stringResult.toString();
-	
-	    // get the price
-	    int init = bodyText.indexOf("<price>") + 7;
-	    int i = init;
-	    while (Character.isDigit(bodyText.charAt(i))) ++i;
-	    int price = Integer.parseInt(bodyText.substring(init, i));
-	
-	    System.out.println("PRICE::::::::: " + price);
-	
-	    String newBody = bodyText.replace(price+"", "99");
-	    byte[] b = newBody.getBytes(Charset.forName("UTF-8"));
-	    ByteArrayInputStream byteInStream = new ByteArrayInputStream(b);
+    DOMSource source = new DOMSource(element);
+    StringWriter stringResult = new StringWriter();
+    TransformerFactory.newInstance().newTransformer().transform(source, new StreamResult(stringResult));
+    String bodyText = stringResult.toString();
+    System.out.println("The whole body 1:\n" + bodyText + "\n--------");
 
+    // get the price
+    int init = bodyText.indexOf("<price>") + 7;
+    int i = init;
+    while (Character.isDigit(bodyText.charAt(i))) ++i;
+    int price = Integer.parseInt(bodyText.substring(init, i));
+
+    System.out.println("NEW PRICE: " + price);
+
+    String newBody = bodyText.replace(price+"", "99");
+    newBody = newBody.substring(newBody.indexOf("S")-1);
+
+    System.out.println("The whole body 2:\n" + newBody + "\n--------");
+
+    byte[] b = newBody.getBytes(Charset.forName("UTF-8"));
+    ByteArrayInputStream byteInStream = new ByteArrayInputStream(b);
+
+    // modify message
 		MessageFactory factory = MessageFactory.newInstance();
 		SOAPMessage newMessage = factory.createMessage(_message.getMimeHeaders(), byteInStream);
 		_message.getSOAPPart().setContent(newMessage.getSOAPPart().getContent());
-
+    
   }
 
 	private void alterSignatureAttack(){}

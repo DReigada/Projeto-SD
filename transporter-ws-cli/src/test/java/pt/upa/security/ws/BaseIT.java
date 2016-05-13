@@ -20,7 +20,7 @@ import pt.upa.transporter.ws.cli.TransporterClient;
  *  Should invoke "live" remote servers 
  */
 public class BaseIT {
-	/*private static class mockCounterBackup implements CounterBackup{
+	private static class mockCounterBackup implements CounterBackup{
 		@Override
 		public void updateMessageCounter(int val) {	}
 	}
@@ -69,5 +69,5 @@ public class BaseIT {
     public void tearDown(){
     	transporter1.clearJobs();
     	transporter2.clearJobs();
-    }*/
+    }
 }

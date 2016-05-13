@@ -22,9 +22,9 @@ public class TransporterClient implements TransporterPortType{
 	public static final String CLASS_NAME = TransporterClient.class.getSimpleName();
 	public static final String TOKEN = "UpaBroker";
 	
-	private TransporterPortType _port;
-	private BindingProvider bindingProvider;
-	private Map<String, Object> requestContext;
+	TransporterPortType _port;
+	BindingProvider bindingProvider;
+	Map<String, Object> requestContext;
 	
 	private String destination;
 	private CounterBackup _counterBackup;
